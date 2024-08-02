@@ -1,0 +1,129 @@
+create_table("models") {
+    t.Column("id", "integer", {primary: true})
+    t.Column("civitai_id", "integer", {null: false})
+    t.Column("name", "string", {null: false})
+    t.Column("description", "text", {})
+    t.Column("allow_no_credit", "boolean", {null: false})
+    t.Column("allow_derivatives", "boolean", {null: false})
+    t.Column("allow_different_license", "boolean", {null: false})
+    t.Column("type", "string", {null: false})
+    t.Column("minor", "boolean", {null: false})
+    t.Column("poi", "boolean", {null: false})
+    t.Column("nsfw", "boolean", {null: false})
+    t.Column("nsfw_level", "integer", {null: false})
+    t.Column("cosmetic", "string", {null: false})
+    t.Timestamps()
+}
+
+create_table("allow_commercial_uses") {
+    t.Column("id", "integer", {primary: true})
+    t.Column("model_id", "integer", {null: false})
+    t.Column("use_type", "string", {null: false})
+    t.ForeignKey("model_id", {"models": ["id"]}, {"on_delete": "cascade"})
+    t.Timestamps()
+}
+
+create_table("stats") {
+    t.Column("id", "integer", {primary: true})
+    t.Column("model_id", "integer", {null: false})
+    t.Column("download_count", "integer", {null: false})
+    t.Column("favorite_count", "integer", {null: false})
+    t.Column("thumbs_up_count", "integer", {null: false})
+    t.Column("thumbs_down_count", "integer", {null: false})
+    t.Column("comment_count", "integer", {null: false})
+    t.Column("rating_count", "integer", {null: false})
+    t.Column("rating", "float", {null: false})
+    t.Column("tipped_amount_count", "integer", {null: false})
+    t.ForeignKey("model_id", {"models": ["id"]}, {"on_delete": "cascade"})
+    t.Timestamps()
+}
+
+create_table("model_version_stats") {
+    t.Column("id", "integer", {primary: true})
+    t.Column("model_version_id", "integer", {null: false})
+    t.Column("download_count", "integer", {null: false})
+    t.Column("thumbs_up_count", "integer", {null: false})
+    t.Column("thumbs_down_count", "integer", {null: false})
+    t.Column("rating_count", "integer", {null: false})
+    t.Column("rating", "float", {null: false})
+    t.ForeignKey("model_version_id", {"model_versions": ["id"]}, {"on_delete": "cascade"})
+    t.Timestamps()
+}
+
+create_table("creators") {
+    t.Column("id", "integer", {primary: true})
+    t.Column("username", "string", {null: false})
+    t.Column("image", "string", {})
+    t.Column("model_id", "integer", {null: false})
+    t.ForeignKey("model_id", {"models": ["id"]}, {"on_delete": "cascade"})
+    t.Timestamps()
+}
+
+create_table("tags") {
+    t.Column("id", "integer", {primary: true})
+    t.Column("name", "string", {null: false})
+    t.Timestamps()
+}
+
+create_table("model_tags") {
+    t.Column("id", "integer", {primary: true})
+    t.Column("model_id", "integer", {null: false})
+    t.Column("tag_id", "integer", {null: false})
+    t.ForeignKey("model_id", {"models": ["id"]}, {"on_delete": "cascade"})
+    t.ForeignKey("tag_id", {"tags": ["id"]}, {"on_delete": "cascade"})
+    t.Timestamps()
+}
+
+create_table("model_versions") {
+    t.Column("id", "integer", {primary: true})
+    t.Column("trained_words", "json", {null: false})
+    t.Column("stats", "json", {null: false})
+    t.Column("civitai_id", "integer", {null: false})
+    t.Column("model_id", "integer", {null: false})
+    t.Column("index", "integer", {null: false})
+    t.Column("name", "string", {null: false})
+    t.Column("base_model", "string", {null: false})
+    t.Column("base_model_type", "string", {null: false})
+    t.Column("published_at", "timestamp", {null: false})
+    t.Column("availability", "string", {null: false})
+    t.Column("nsfw_level", "integer", {null: false})
+    t.Column("description", "text", {null: false})
+    t.Column("download_url", "string", {})
+    t.ForeignKey("model_id", {"models": ["id"]}, {"on_delete": "cascade"})
+    t.Timestamps()
+}
+
+create_table("files") {
+    t.Column("id", "integer", {primary: true})
+    t.Column("civitai_id", "integer", {null: false})
+    t.Column("model_version_id", "integer", {null: false})
+    t.Column("size_kb", "float", {null: false})
+    t.Column("name", "string", {null: false})
+    t.Column("type", "string", {null: false})
+    t.Column("pickle_scan_result", "string", {})
+    t.Column("pickle_scan_message", "text", {})
+    t.Column("virus_scan_result", "string", {})
+    t.Column("virus_scan_message", "text", {})
+    t.Column("scanned_at", "timestamp", {})
+    t.Column("metadata", "json", {})
+    t.Column("hashes", "json", {})
+    t.Column("download_url", "string", {})
+    t.Column("primary", "boolean", {null: false})
+    t.ForeignKey("model_version_id", {"model_versions": ["id"]}, {"on_delete": "cascade"})
+    t.Timestamps()
+}
+
+create_table("images") {
+    t.Column("id", "integer", {primary: true})
+    t.Column("model_version_id", "integer", {null: false})
+    t.Column("url", "string", {null: false})
+    t.Column("nsfw_level", "integer", {null: false})
+    t.Column("width", "integer", {null: false})
+    t.Column("height", "integer", {null: false})
+    t.Column("hash", "string", {})
+    t.Column("type", "string", {null: false})
+    t.Column("has_meta", "boolean", {null: false})
+    t.Column("on_site", "boolean", {null: false})
+    t.ForeignKey("model_version_id", {"model_versions": ["id"]}, {"on_delete": "cascade"})
+    t.Timestamps()
+}
