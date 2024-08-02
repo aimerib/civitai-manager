@@ -71,21 +71,6 @@ var _ = grift.Namespace("api", func() {
 })
 
 func processModel(tx *pop.Connection, model *models.Model) error {
-	// existingModel := models.Model{}
-	// err := tx.Where("civitai_id = ?", model.CivitaiID).First(&existingModel)
-
-	// if err == nil {
-	// 	// Update existing model
-	// 	existingModel = *model
-	// 	err = tx.Update(&existingModel)
-	// } else {
-	// 	// Create new model
-	// 	err = tx.Create(model)
-	// }
-
-	// if err != nil {
-	// 	return err
-	// }
 	err := tx.Create(model)
 	if err != nil {
 		return err
@@ -107,10 +92,10 @@ func processModel(tx *pop.Connection, model *models.Model) error {
 		return err
 	}
 
-	// err = processTrainedWords(tx, model)
-	// if err != nil {
-	// 	return err
-	// }
+	err = processCreator(tx, model)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -123,8 +108,20 @@ func processModelVersions(tx *pop.Connection, model *models.Model) error {
 			return err
 		}
 
-		// Process files, stats, images, hashes
-		// Add similar processing for these associated data
+		err = processFiles(tx, &version)
+		if err != nil {
+			return err
+		}
+
+		err = processImages(tx, &version)
+		if err != nil {
+			return err
+		}
+
+		err = processModelVersionStats(tx, &version)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -154,17 +151,34 @@ func processStats(tx *pop.Connection, model *models.Model) error {
 	return tx.Create(&model.Stat)
 }
 
-// func processTrainedWords(tx *pop.Connection, model *models.Model) error {
-// 	// Process trained words
-// 	for _, word := range model. {
-// 		trainedWord := models.TrainedWord{
-// 			ModelID: model.ID,
-// 			Word:    word,
-// 		}
-// 		err := tx.Create(&trainedWord)
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
-// return nil
-// }
+func processCreator(tx *pop.Connection, model *models.Model) error {
+	model.Creator.ModelID = model.ID
+	return tx.Create(&model.Creator)
+}
+
+func processFiles(tx *pop.Connection, modelVersion *models.ModelVersion) error {
+	for _, file := range modelVersion.Files {
+		file.ModelVersionID = modelVersion.ID
+		err := tx.Create(&file)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func processImages(tx *pop.Connection, modelVersion *models.ModelVersion) error {
+	for _, image := range modelVersion.Images {
+		image.ModelVersionID = modelVersion.ID
+		err := tx.Create(&image)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func processModelVersionStats(tx *pop.Connection, modelVersion *models.ModelVersion) error {
+	modelVersion.Stats.ModelVersionID = modelVersion.ID
+	return tx.Create(&modelVersion.Stats)
+}

@@ -11,25 +11,26 @@ import (
 )
 
 type Model struct {
-	ID                    int           `json:"-" db:"id"`
-	CivitaiID             int           `json:"id" db:"civitai_id"`
-	Name                  string        `json:"name" db:"name"`
-	Description           *string       `json:"description" db:"description"`
-	AllowNoCredit         bool          `json:"allowNoCredit" db:"allow_no_credit"`
-	AllowDerivatives      bool          `json:"allowDerivatives" db:"allow_derivatives"`
-	AllowDifferentLicense bool          `json:"allowDifferentLicense" db:"allow_different_license"`
-	Type                  string        `json:"type" db:"type"`
-	Minor                 bool          `json:"minor" db:"minor"`
-	Poi                   bool          `json:"poi" db:"poi"`
-	Nsfw                  bool          `json:"nsfw" db:"nsfw"`
-	NsfwLevel             int           `json:"nsfwLevel" db:"nsfw_level"`
-	Cosmetic              nulls.String  `json:"cosmetic" db:"cosmetic"`
-	CreatedAt             time.Time     `json:"-" db:"created_at"`
-	UpdatedAt             time.Time     `json:"-" db:"updated_at"`
-	ModelVersions         ModelVersions `json:"modelVersions" has_many:"model_version"`
-	Stat                  Stat          `json:"stats" has_one:"stat"`
-	Creator               Creator       `json:"creator" has_one:"creator"`
-	Tags                  Tags          `json:"-" has_many:"model_tags"`
+	ID                    int             `json:"-" db:"id"`
+	CivitaiID             int             `json:"id" db:"civitai_id"`
+	Name                  string          `json:"name" db:"name"`
+	Description           *string         `json:"description" db:"description"`
+	AllowNoCredit         bool            `json:"allowNoCredit" db:"allow_no_credit"`
+	AllowDerivatives      bool            `json:"allowDerivatives" db:"allow_derivatives"`
+	AllowDifferentLicense bool            `json:"allowDifferentLicense" db:"allow_different_license"`
+	AllowCommericalUse    json.RawMessage `json:"allowCommercialUse" db:"allow_commercial_use"`
+	Type                  string          `json:"type" db:"type"`
+	Minor                 bool            `json:"minor" db:"minor"`
+	Poi                   bool            `json:"poi" db:"poi"`
+	Nsfw                  bool            `json:"nsfw" db:"nsfw"`
+	NsfwLevel             int             `json:"nsfwLevel" db:"nsfw_level"`
+	Cosmetic              nulls.String    `json:"cosmetic" db:"cosmetic"`
+	CreatedAt             time.Time       `json:"-" db:"created_at"`
+	UpdatedAt             time.Time       `json:"-" db:"updated_at"`
+	ModelVersions         ModelVersions   `json:"modelVersions" has_many:"model_version"`
+	Stat                  Stat            `json:"stats" has_one:"stat"`
+	Creator               Creator         `json:"creator" has_one:"creator"`
+	Tags                  Tags            `json:"-" has_many:"model_tags"`
 }
 
 type Models []Model
