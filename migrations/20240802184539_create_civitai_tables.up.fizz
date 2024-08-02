@@ -16,14 +16,6 @@ create_table("models") {
     t.Timestamps()
 }
 
-create_table("allow_commercial_uses") {
-    t.Column("id", "integer", {primary: true})
-    t.Column("model_id", "integer", {null: false})
-    t.Column("use_type", "string", {null: false})
-    t.ForeignKey("model_id", {"models": ["id"]}, {"on_delete": "cascade"})
-    t.Timestamps()
-}
-
 create_table("stats") {
     t.Column("id", "integer", {primary: true})
     t.Column("model_id", "integer", {null: false})
@@ -54,7 +46,7 @@ create_table("model_version_stats") {
 create_table("creators") {
     t.Column("id", "integer", {primary: true})
     t.Column("username", "string", {null: false})
-    t.Column("image", "string", {})
+    t.Column("image", "string", {null: false})
     t.Column("model_id", "integer", {null: false})
     t.ForeignKey("model_id", {"models": ["id"]}, {"on_delete": "cascade"})
     t.Timestamps()
@@ -78,7 +70,6 @@ create_table("model_tags") {
 create_table("model_versions") {
     t.Column("id", "integer", {primary: true})
     t.Column("trained_words", "json", {null: false})
-    t.Column("stats", "json", {null: false})
     t.Column("civitai_id", "integer", {null: false})
     t.Column("model_id", "integer", {null: false})
     t.Column("index", "integer", {null: false})
@@ -101,11 +92,11 @@ create_table("files") {
     t.Column("size_kb", "float", {null: false})
     t.Column("name", "string", {null: false})
     t.Column("type", "string", {null: false})
-    t.Column("pickle_scan_result", "string", {})
-    t.Column("pickle_scan_message", "text", {})
-    t.Column("virus_scan_result", "string", {})
-    t.Column("virus_scan_message", "text", {})
-    t.Column("scanned_at", "timestamp", {})
+    t.Column("pickle_scan_result", "string", {null: false})
+    t.Column("pickle_scan_message", "text", {null: false})
+    t.Column("virus_scan_result", "string", {null: false})
+    t.Column("virus_scan_message", "text", {null: false})
+    t.Column("scanned_at", "timestamp", {null: false})
     t.Column("metadata", "json", {})
     t.Column("hashes", "json", {})
     t.Column("download_url", "string", {})
@@ -117,7 +108,7 @@ create_table("files") {
 create_table("images") {
     t.Column("id", "integer", {primary: true})
     t.Column("model_version_id", "integer", {null: false})
-    t.Column("url", "string", {null: false})
+    t.Column("url", "string", {})
     t.Column("nsfw_level", "integer", {null: false})
     t.Column("width", "integer", {null: false})
     t.Column("height", "integer", {null: false})

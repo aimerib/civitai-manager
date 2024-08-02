@@ -12,15 +12,26 @@ import (
 )
 
 var _ = grift.Namespace("api", func() {
-	grift.Desc("fetch_models", "Fetch and update models from API")
+	grift.Desc("fetch_models", "Fetch and update models from API. Usage: buffalo task api:fetch_models [limit]")
 	grift.Add("fetch_models", func(c *grift.Context) error {
-		baseURL := "https://civitai.com/api/v1/models?limit=10&types=Checkpoint"
+		baseURL := "https://civitai.com/api/v1/models?limit=100&types=Checkpoint&tags=nsfw&sort=Newest&nsfw=true&period=AllTime"
+
+		// Parse the optional limit argument
+		var limit int
+		if len(c.Args) > 0 {
+			_, err := fmt.Sscanf(c.Args[0], "%d", &limit)
+			if err != nil {
+				return fmt.Errorf("invalid limit argument: please provide a number")
+			}
+		}
 
 		// Get database connection
 		tx, err := pop.Connect("development")
 		if err != nil {
 			return err
 		}
+
+		modelCount := 0
 
 		for url := baseURL; url != ""; {
 			// Fetch JSON data
@@ -47,7 +58,7 @@ var _ = grift.Namespace("api", func() {
 				existingModel := models.Model{}
 				err := tx.Where("civitai_id = ?", model.CivitaiID).First(&existingModel)
 				if err == nil {
-					// Model already exists, stop processing
+					// Model already exists, skip processing
 					return nil
 				}
 
@@ -55,8 +66,16 @@ var _ = grift.Namespace("api", func() {
 				if err != nil {
 					return err
 				}
+
+				modelCount++
+				fmt.Printf("Imported model: %s (ID: %d)\n", model.Name, model.CivitaiID)
+
+				// Check if we've reached the limit
+				if limit > 0 && modelCount >= limit {
+					fmt.Printf("Reached import limit of %d models.\n", limit)
+					return nil
+				}
 			}
-			fmt.Println(response)
 
 			// Set next page URL
 			if response.Metadata.NextPage != nil {
@@ -66,6 +85,7 @@ var _ = grift.Namespace("api", func() {
 			}
 		}
 
+		fmt.Printf("Imported a total of %d models.\n", modelCount)
 		return nil
 	})
 })
