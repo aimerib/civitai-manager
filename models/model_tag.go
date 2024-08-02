@@ -8,11 +8,11 @@ import (
 )
 
 type ModelTag struct {
-	ID        int       `json:"id" db:"id"`
-	ModelID   int       `json:"model_id" db:"model_id"`
-	TagID     int       `json:"tag_id" db:"tag_id"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+	ID        int       `db:"id"`
+	ModelID   int       `db:"model_id"`
+	TagID     int       `db:"tag_id"`
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
 }
 
 type ModelTags []ModelTag

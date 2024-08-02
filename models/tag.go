@@ -8,11 +8,11 @@ import (
 )
 
 type Tag struct {
-	ID        int       `json:"id" db:"id"`
+	ID        int       `json:"-" db:"id"`
 	Name      string    `json:"name" db:"name"`
 	Models    Models    `many_to_many:"model_tags"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+	CreatedAt time.Time `json:"-" db:"created_at"`
+	UpdatedAt time.Time `json:"-" db:"updated_at"`
 }
 
 type Tags []Tag

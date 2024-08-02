@@ -8,9 +8,9 @@ import (
 )
 
 type File struct {
-	ID                int          `db:"id"`
+	ID                int          `json:"-" db:"id"`
 	CivitaiID         int          `json:"id" db:"civitai_id"`
-	ModelVersionID    int          `db:"model_version_id"`
+	ModelVersionID    int          `json:"-" db:"model_version_id"`
 	SizeKB            float64      `json:"sizeKB" db:"size_kb"`
 	Name              string       `json:"name" db:"name"`
 	Type              string       `json:"type" db:"type"`

@@ -3,14 +3,14 @@ package models
 import "time"
 
 type ModelVersionStat struct {
-	ID              int       `json:"id" db:"id"`
-	DownloadCount   int       `json:"civitai_id" db:"civitai_id"`
-	RatingCount     int       `json:"model_id" db:"model_id"`
-	Rating          int       `json:"index" db:"index"`
-	ThumbsUpCount   string    `json:"name" db:"name"`
-	ThumbsDownCount string    `json:"base_model" db:"base_model"`
-	CreatedAt       time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at" db:"updated_at"`
+	ID              int       `json:"-" db:"id"`
+	DownloadCount   int       `json:"downloadCount" db:"download_count"`
+	RatingCount     int       `json:"ratingCount" db:"rating_count"`
+	Rating          float64   `json:"rating" db:"rating"`
+	ThumbsUpCount   int       `json:"thumbsUpCount" db:"thumbs_up_count"`
+	ThumbsDownCount int       `json:"thumbsDownCount" db:"thumbs_down_count"`
+	CreatedAt       time.Time `jjson:"-" db:"created_at"`
+	UpdatedAt       time.Time `json:"-" db:"updated_at"`
 }
 
 type ModelVersionStats []ModelVersionStat

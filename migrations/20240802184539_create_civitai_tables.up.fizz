@@ -2,7 +2,7 @@ create_table("models") {
     t.Column("id", "integer", {primary: true})
     t.Column("civitai_id", "integer", {null: false})
     t.Column("name", "string", {null: false})
-    t.Column("description", "text", {})
+    t.Column("description", "text", {null: false})
     t.Column("allow_no_credit", "boolean", {null: false})
     t.Column("allow_derivatives", "boolean", {null: false})
     t.Column("allow_different_license", "boolean", {null: false})
@@ -76,7 +76,7 @@ create_table("model_tags") {
 
 create_table("model_versions") {
     t.Column("id", "integer", {primary: true})
-    t.Column("trained_words", "json", {null: false})
+    t.Column("trained_words", "text", {null: false})
     t.Column("stats", "json", {null: false})
     t.Column("civitai_id", "integer", {null: false})
     t.Column("model_id", "integer", {null: false})

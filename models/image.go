@@ -8,8 +8,8 @@ import (
 )
 
 type Image struct {
-	ID             int       `db:"id"`
-	ModelVersionID int       `db:"model_version_id"`
+	ID             int       `json:"-" db:"id"`
+	ModelVersionID int       `json:"-" db:"model_version_id"`
 	URL            string    `json:"url" db:"url"`
 	NSFWLevel      int       `json:"nsfwLevel" db:"nsfw_level"`
 	Width          int       `json:"width" db:"width"`
@@ -18,8 +18,8 @@ type Image struct {
 	Type           string    `json:"type" db:"type"`
 	HasMeta        bool      `json:"hasMeta" db:"has_meta"`
 	OnSite         bool      `json:"onSite" db:"on_site"`
-	CreatedAt      time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at" db:"updated_at"`
+	CreatedAt      time.Time `json:"-" db:"created_at"`
+	UpdatedAt      time.Time `json:"-" db:"updated_at"`
 }
 
 type Images []Image

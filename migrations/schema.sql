@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS "schema_migration" (
-"version" TEXT PRIMARY KEY
+"version" TEXT NOT NULL
 );
 CREATE UNIQUE INDEX "schema_migration_version_idx" ON "schema_migration" (version);
 CREATE TABLE IF NOT EXISTS "models" (
 "id" INTEGER PRIMARY KEY AUTOINCREMENT,
 "civitai_id" INTEGER,
 "name" TEXT,
-"description" TEXT NOT NULL,
+"description" TEXT,
 "allow_no_credit" NUMERIC,
 "allow_derivatives" NUMERIC,
 "allow_different_license" NUMERIC,

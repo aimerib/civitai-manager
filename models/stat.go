@@ -8,8 +8,8 @@ import (
 )
 
 type Stat struct {
-	ID                int       `db:"id"`
-	ModelID           int       `db:"model_id"`
+	ID                int       `json:"-" db:"id"`
+	ModelID           int       `json:"-" db:"model_id"`
 	DownloadCount     int       `json:"downloadCount" db:"download_count"`
 	FavoriteCount     int       `json:"favoriteCount" db:"favorite_count"`
 	ThumbsUpCount     int       `json:"thumbsUpCount" db:"thumbs_up_count"`
@@ -18,8 +18,8 @@ type Stat struct {
 	RatingCount       int       `json:"ratingCount" db:"rating_count"`
 	Rating            float64   `json:"rating" db:"rating"`
 	TippedAmountCount int       `json:"tippedAmountCount" db:"tipped_amount_count"`
-	CreatedAt         time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt         time.Time `json:"updated_at" db:"updated_at"`
+	CreatedAt         time.Time `json:"-" db:"created_at"`
+	UpdatedAt         time.Time `json:"-" db:"updated_at"`
 }
 
 type Stats []Stat

@@ -11,21 +11,21 @@ import (
 )
 
 type Model struct {
-	ID                    int           `json:"id" db:"id"`
-	CivitaiID             int           `json:"civitai_id" db:"civitai_id"`
+	ID                    int           `json:"-" db:"id"`
+	CivitaiID             int           `json:"id" db:"civitai_id"`
 	Name                  string        `json:"name" db:"name"`
 	Description           *string       `json:"description" db:"description"`
-	AllowNoCredit         bool          `json:"allow_no_credit" db:"allow_no_credit"`
-	AllowDerivatives      bool          `json:"allow_derivatives" db:"allow_derivatives"`
-	AllowDifferentLicense bool          `json:"allow_different_license" db:"allow_different_license"`
+	AllowNoCredit         bool          `json:"allowNoCredit" db:"allow_no_credit"`
+	AllowDerivatives      bool          `json:"allowDerivatives" db:"allow_derivatives"`
+	AllowDifferentLicense bool          `json:"allowDifferentLicense" db:"allow_different_license"`
 	Type                  string        `json:"type" db:"type"`
 	Minor                 bool          `json:"minor" db:"minor"`
 	Poi                   bool          `json:"poi" db:"poi"`
 	Nsfw                  bool          `json:"nsfw" db:"nsfw"`
-	NsfwLevel             int           `json:"nsfw_level" db:"nsfw_level"`
+	NsfwLevel             int           `json:"nsfwLevel" db:"nsfw_level"`
 	Cosmetic              nulls.String  `json:"cosmetic" db:"cosmetic"`
-	CreatedAt             time.Time     `json:"created_at" db:"created_at"`
-	UpdatedAt             time.Time     `json:"updated_at" db:"updated_at"`
+	CreatedAt             time.Time     `json:"-" db:"created_at"`
+	UpdatedAt             time.Time     `json:"-" db:"updated_at"`
 	ModelVersions         ModelVersions `json:"modelVersions" has_many:"model_version"`
 	Stat                  Stat          `json:"stats" has_one:"stat"`
 	Creator               Creator       `json:"creator" has_one:"creator"`
