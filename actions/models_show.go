@@ -22,11 +22,11 @@ func ModelsShowHandler(c buffalo.Context) error {
 	model := models.Model{}
 
 	// Get the model with the given ID from the DB
-	err := tx.Where("id =?", id).First(&model)
+	err := tx.Where("id =?", id).EagerPreload("Creator").EagerPreload("Stats").EagerPreload("ModelVersions.Images").EagerPreload("ModelVersions.Files").First(&model)
 	if err != nil {
-		return c.Error(404, fmt.Errorf("models.Model with ID=%s not found", id))
+		return c.Error(404, fmt.Errorf("models.Model with ID=%s not found. Error: %s", id, err))
 	}
-
+	fmt.Println("Retrieved model:", model.ModelVersions)
 	// Make the models available to the view
 	c.Set("model", model)
 
