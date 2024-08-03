@@ -166,9 +166,9 @@ func processTags(tx *pop.Connection, model *models.Model) error {
 }
 
 func processStats(tx *pop.Connection, model *models.Model) error {
-	model.Stat.ModelID = model.ID
+	model.Stats.ModelID = model.ID
 	// Process model stats
-	return tx.Create(&model.Stat)
+	return tx.Create(&model.Stats)
 }
 
 func processCreator(tx *pop.Connection, model *models.Model) error {
@@ -176,7 +176,7 @@ func processCreator(tx *pop.Connection, model *models.Model) error {
 	return tx.Create(&model.Creator)
 }
 
-func processFiles(tx *pop.Connection, modelVersion *models.ModelVersion) error {
+func processFiles(tx *pop.Connection, modelVersion *models.ModelVersions) error {
 	for _, file := range modelVersion.Files {
 		file.ModelVersionID = modelVersion.ID
 		err := tx.Create(&file)
@@ -187,7 +187,7 @@ func processFiles(tx *pop.Connection, modelVersion *models.ModelVersion) error {
 	return nil
 }
 
-func processImages(tx *pop.Connection, modelVersion *models.ModelVersion) error {
+func processImages(tx *pop.Connection, modelVersion *models.ModelVersions) error {
 	for _, image := range modelVersion.Images {
 		image.ModelVersionID = modelVersion.ID
 		err := tx.Create(&image)
@@ -198,7 +198,7 @@ func processImages(tx *pop.Connection, modelVersion *models.ModelVersion) error 
 	return nil
 }
 
-func processModelVersionStats(tx *pop.Connection, modelVersion *models.ModelVersion) error {
+func processModelVersionStats(tx *pop.Connection, modelVersion *models.ModelVersions) error {
 	modelVersion.Stats.ModelVersionID = modelVersion.ID
 	return tx.Create(&modelVersion.Stats)
 }

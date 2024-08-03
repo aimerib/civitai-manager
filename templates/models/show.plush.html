@@ -1,0 +1,75 @@
+<div class="mx-auto">
+  <button
+    class="mb-6 text-blue-400 hover:text-blue-300"
+    hx-get="<%= rootPath() %>"
+    hx-target="body"
+    hx-push-url="true"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-6 w-6 inline-block mr-2"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M10 19l-7-7m0 0l7-7m-7 7h18"
+      />
+    </svg>
+    Back
+  </button>
+
+  <h1 class="text-4xl font-bold mb-6"><% model.Name %></h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div>
+      <h2 class="text-2xl font-semibold mb-4">Model Details</h2>
+      <p class="mb-2"><strong>Type:</strong> <% model.Type %></p>
+      <p class="mb-2">
+        <strong>NSFW:</strong>
+        <% if (model.Nsfw) { %> Yes <% } else { %> No <% } %>
+      </p>
+      <p class="mb-4"><strong>Description:</strong> <% model.Description %></p>
+
+      <h3 class="text-xl font-semibold mb-2">Creator</h3>
+      <p class="mb-2"><strong>Name:</strong> <% model.Creator.Username %></p>
+    </div>
+
+    <div>
+      <h2 class="text-2xl font-semibold mb-4">Model Versions</h2>
+      <% for (version) in model.ModelVersions { %>
+      <div class="bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 class="text-xl font-semibold mb-2"><% version.Name %></h3>
+        <p class="mb-2"><strong>Base Model:</strong> <% version.BaseModel %></p>
+        <p class="mb-2">
+          <strong>Published:</strong> <% version.PublishedAt.Format("Jan 02,
+          2006") %>
+        </p>
+
+        <h4 class="text-lg font-semibold mt-4 mb-2">Files</h4>
+        <% for (file) in version.Files { %>
+        <div class="bg-gray-700 rounded p-2 mb-2">
+          <p><strong>Name:</strong> <% file.Name %></p>
+          <p><strong>Size:</strong> <% file.SizeKB %> KB</p>
+          <p><strong>Type:</strong> <% file.Type %></p>
+        </div>
+        <% } %>
+
+        <h4 class="text-lg font-semibold mt-4 mb-2">Images</h4>
+        <div class="grid grid-cols-2 gap-4">
+          <% for (image) in version.Images { %>
+          <img
+            src="<%= image.URL %>"
+            alt="Model image"
+            class="w-full h-auto rounded"
+          />
+          <% } %>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>

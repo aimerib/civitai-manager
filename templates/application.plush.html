@@ -1,23 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta charset="utf-8">
-    <title>Buffalo - Civitai</title>
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <%= stylesheetTag("buffalo.css") %>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Civitai Model Manager</title>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <%= stylesheetTag("application.css") %>
     <meta name="csrf-param" content="authenticity_token" />
     <meta name="csrf-token" content="<%= authenticity_token %>" />
     <link rel="icon" href="<%= assetPath("images/favicon.ico") %>">
   </head>
-  <body>
+  <body class="bg-gray-900 text-white min-h-screen">
+    <header class="fixed top-0 left-0 right-0 bg-blue-600 text-white p-4 z-50">
+      <h1 class="text-2xl font-bold">Civitai Model Manager</h1>
+    </header>
 
-    <div class="container">
-      <%= partial("flash.html") %>
-      <%= yield %>
-    </div>
+    <nav
+      id="sidebar"
+      class="fixed top-0 left-0 h-full w-64 bg-gray-800 text-white transform -translate-x-full transition-transform duration-300 ease-in-out z-40"
+    >
+      <ul class="p-4 mt-16">
+        <li class="mb-2">
+          <a href="#" class="block p-2 hover:bg-gray-700">Home</a>
+        </li>
+        <li class="mb-2">
+          <a href="#" class="block p-2 hover:bg-gray-700">Models</a>
+        </li>
+        <li class="mb-2">
+          <a href="#" class="block p-2 hover:bg-gray-700">Settings</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="fixed top-0 left-0 w-24 h-full z-30" id="sidebar-trigger"></div>
+
+    <main class="container mx-auto mt-20">
+      <%= partial("flash.html") %> <%= yield %>
+    </main>
 
     <%= javascriptTag("application.js") %>
+    <script>
+      // const sidebar = document.getElementById("sidebar");
+      // const sidebarTrigger = document.getElementById("sidebar-trigger");
+
+      // sidebarTrigger.addEventListener("mouseenter", () => {
+      //   sidebar.classList.remove("-translate-x-full");
+      // });
+
+      // sidebar.addEventListener("mouseleave", () => {
+      //   sidebar.classList.add("-translate-x-full");
+      // });
+      document.addEventListener("DOMContentLoaded", function () {
+        const sidebar = document.getElementById("sidebar");
+        const sidebarTrigger = document.getElementById("sidebar-trigger");
+
+        if (sidebar && sidebarTrigger) {
+          sidebarTrigger.addEventListener("mouseenter", () => {
+            sidebar.classList.remove("-translate-x-full");
+          });
+
+          sidebar.addEventListener("mouseleave", () => {
+            sidebar.classList.add("-translate-x-full");
+          });
+        }
+      }, {
+        once: true,
+        passive: true,
+        capture: true,
+      });
+    </script>
   </body>
 </html>

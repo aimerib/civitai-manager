@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"sync"
 
-	"civitai/locales"
 	"civitai/models"
 	"civitai/public"
 
@@ -63,10 +62,12 @@ func App() *buffalo.App {
 		// Remove to disable this.
 		app.Use(popmw.Transaction(models.DB))
 		// Setup and use translations:
-		app.Use(translations())
+		// app.Use(translations())
 
-		app.GET("/", HomeHandler)
+		app.GET("/routes", HomeHandler)
 
+		app.GET("/", ModelsIndexHandler)
+		app.GET("/models/{id}", ModelsShowHandler)
 		app.ServeFiles("/", http.FS(public.FS())) // serve files from the public directory
 	})
 
@@ -77,13 +78,13 @@ func App() *buffalo.App {
 // and will return a middleware to use to load the correct locale for each
 // request.
 // for more information: https://gobuffalo.io/en/docs/localization
-func translations() buffalo.MiddlewareFunc {
-	var err error
-	if T, err = i18n.New(locales.FS(), "en-US"); err != nil {
-		app.Stop(err)
-	}
-	return T.Middleware()
-}
+// func translations() buffalo.MiddlewareFunc {
+// 	var err error
+// 	if T, err = i18n.New(locales.FS(), "en-US"); err != nil {
+// 		app.Stop(err)
+// 	}
+// 	return T.Middleware()
+// }
 
 // forceSSL will return a middleware that will redirect an incoming request
 // if it is not HTTPS. "http://example.com" => "https://example.com".

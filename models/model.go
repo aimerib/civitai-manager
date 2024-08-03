@@ -27,10 +27,11 @@ type Model struct {
 	Cosmetic              nulls.String    `json:"cosmetic" db:"cosmetic"`
 	CreatedAt             time.Time       `json:"-" db:"created_at"`
 	UpdatedAt             time.Time       `json:"-" db:"updated_at"`
-	ModelVersions         ModelVersions   `json:"modelVersions" has_many:"model_version"`
-	Stat                  Stat            `json:"stats" has_one:"stat"`
+	ModelVersions         []ModelVersions `json:"modelVersions" has_many:"model_versions"`
+	Stats                 Stat            `json:"stats" has_one:"stat"`
 	Creator               Creator         `json:"creator" has_one:"creator"`
-	Tags                  Tags            `json:"-" has_many:"model_tags"`
+	Tags                  Tags            `json:"-" many_to_many:"model_tags" db:"-"`
+	Checked               bool            `json:"-" db:"checked"`
 }
 
 type Models []Model

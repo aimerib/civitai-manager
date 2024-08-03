@@ -5,11 +5,11 @@ import (
 	"time"
 )
 
-type ModelVersion struct {
+type ModelVersions struct {
 	ID            int              `json:"-" db:"id"`
 	CivitaiID     int              `json:"id" db:"civitai_id"`
 	ModelID       int              `json:"-" db:"model_id"`
-	Index         int              `json:"index" db:"index"`
+	Index         int              `json:"index" db:"model_index"`
 	Name          string           `json:"name" db:"name"`
 	BaseModel     string           `json:"baseModel" db:"base_model"`
 	BaseModelType string           `json:"baseModelType" db:"base_model_type"`
@@ -24,6 +24,7 @@ type ModelVersion struct {
 	Images        Images           `json:"images" has_many:"images"`
 	CreatedAt     time.Time        `json:"-" db:"created_at"`
 	UpdatedAt     time.Time        `json:"-" db:"updated_at"`
+	Model         Model            `json:"-" belongs_to:"model"`
 }
 
-type ModelVersions []ModelVersion
+// type ModelVersions []ModelVersions
