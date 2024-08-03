@@ -15,7 +15,7 @@ type Image struct {
 	Width          int       `json:"width" db:"width"`
 	Height         int       `json:"height" db:"height"`
 	Hash           *string   `json:"hash" db:"hash"`
-	Type           string    `json:"type" db:"type"`
+	Type           *string   `json:"type" db:"type"`
 	HasMeta        bool      `json:"hasMeta" db:"has_meta"`
 	OnSite         bool      `json:"onSite" db:"on_site"`
 	CreatedAt      time.Time `json:"-" db:"created_at"`

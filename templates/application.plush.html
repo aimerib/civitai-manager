@@ -5,42 +5,154 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Civitai Model Manager</title>
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script src="https://unpkg.com/idiomorph/dist/idiomorph-ext.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <%= stylesheetTag("application.css") %>
     <meta name="csrf-param" content="authenticity_token" />
     <meta name="csrf-token" content="<%= authenticity_token %>" />
     <link rel="icon" href="<%= assetPath("images/favicon.ico") %>">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                100: "#e6f0ff",
+                200: "#cce0ff",
+                300: "#99c0ff",
+                400: "#66a0ff",
+                500: "#0066ff",
+                600: "#0052cc",
+                700: "#003d99",
+                800: "#002966",
+                900: "#001433",
+              },
+              secondary: {
+                100: "#fff0e6",
+                200: "#ffe0cc",
+                300: "#ffc299",
+                400: "#ffa366",
+                500: "#ff6600",
+                600: "#cc5200",
+                700: "#993d00",
+                800: "#662900",
+                900: "#331400",
+              },
+              background: {
+                dark: "#1a1b1e",
+                card: "#25262b",
+              },
+              text: {
+                light: "#ffffff",
+                muted: "#909296",
+              },
+              border: "#373a40",
+            },
+            fontFamily: {
+              sans: [
+                "-apple-system",
+                "BlinkMacSystemFont",
+                "Segoe UI",
+                "Roboto",
+                "Oxygen",
+                "Ubuntu",
+                "Cantarell",
+                "Fira Sans",
+                "Droid Sans",
+                "Helvetica Neue",
+                "sans-serif",
+              ],
+            },
+            fontSize: {
+              sm: "12px",
+              base: "14px",
+              lg: "16px",
+            },
+            fontWeight: {
+              normal: 400,
+              bold: 700,
+            },
+            lineHeight: {
+              base: 1.5,
+            },
+            spacing: {
+              xs: "4px",
+              sm: "8px",
+              md: "16px",
+              lg: "24px",
+              xl: "32px",
+            },
+            borderRadius: {
+              sm: "4px",
+              md: "8px",
+              lg: "12px",
+            },
+            boxShadow: {
+              card: "0 1px 3px rgba(0, 0, 0, 0.1)",
+              dropdown: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            },
+            height: {
+              header: "60px",
+            },
+            width: {
+              sidebar: "240px",
+            },
+            maxWidth: {
+              content: "1200px",
+            },
+            zIndex: {
+              header: 1000,
+              dropdown: 1050,
+              modal: 1100,
+            },
+            transitionDuration: {
+              fast: "200ms",
+              medium: "300ms",
+            },
+            transitionTimingFunction: {
+              ease: "ease",
+            },
+          },
+        },
+      };
+    </script>
   </head>
-  <body class="bg-gray-900 text-white min-h-screen">
+  <body class="bg-background-dark text-white min-h-screen" hx-ext="morph">
     <header class="fixed top-0 left-0 right-0 bg-blue-600 text-white p-4 z-50">
       <h1 class="text-2xl font-bold">Civitai Model Manager</h1>
     </header>
+    <div class="flex">
+      <nav
+        id="sidebar"
+        class="fixed rounded-e-md max-h-[94%] mt-1 top-0 left-0 top-16 m-height-9 h-screen overscroll-y-auto w-64 bg-gray-800/90 backdrop-blur border-y border-r border-y-slate-700 border-r-slate-700 text-white transform -translate-x-full transition-transform duration-300 ease-in-out z-40"
+      >
+        <ul class="p-4 mt-16">
+          <li class="mb-2">
+            <a href="/" class="block p-2 hover:bg-gray-700 hover:rounded-md">Home</a>
+          </li>
+          <li class="mb-2">
+            <a href="#" class="block p-2 hover:bg-gray-700 hover:rounded-md">Models</a>
+          </li>
+          <li class="mb-2">
+            <a href="#" class="block p-2 hover:bg-gray-700 hover:rounded-md">Settings</a>
+          </li>
+        </ul>
+      </nav>
 
-    <nav
-      id="sidebar"
-      class="fixed top-0 left-0 h-full w-64 bg-gray-800 text-white transform -translate-x-full transition-transform duration-300 ease-in-out z-40"
-    >
-      <ul class="p-4 mt-16">
-        <li class="mb-2">
-          <a href="#" class="block p-2 hover:bg-gray-700">Home</a>
-        </li>
-        <li class="mb-2">
-          <a href="#" class="block p-2 hover:bg-gray-700">Models</a>
-        </li>
-        <li class="mb-2">
-          <a href="#" class="block p-2 hover:bg-gray-700">Settings</a>
-        </li>
-      </ul>
-    </nav>
+      <div
+        class="fixed top-0 left-0 w-24 h-full z-30"
+        id="sidebar-trigger"
+      ></div>
 
-    <div class="fixed top-0 left-0 w-24 h-full z-30" id="sidebar-trigger"></div>
-
-    <main class="container mx-auto mt-20">
-      <%= partial("flash.html") %> <%= yield %>
-    </main>
+      <main class="container mx-auto mt-20 flex-grow px-24">
+        <%= partial("flash.html") %>
+        <div id="content" class="flex-grow" <%= yield %> </div>
+      </main>
+    </div>
 
     <%= javascriptTag("application.js") %>
     <script>
+      htmx.config.globalViewTransitions = true
       // const sidebar = document.getElementById("sidebar");
       // const sidebarTrigger = document.getElementById("sidebar-trigger");
 
@@ -51,23 +163,25 @@
       // sidebar.addEventListener("mouseleave", () => {
       //   sidebar.classList.add("-translate-x-full");
       // });
-      document.addEventListener("DOMContentLoaded", function () {
+      htmx.onLoad(function () {
         const sidebar = document.getElementById("sidebar");
         const sidebarTrigger = document.getElementById("sidebar-trigger");
 
         if (sidebar && sidebarTrigger) {
-          sidebarTrigger.addEventListener("mouseenter", () => {
-            sidebar.classList.remove("-translate-x-full");
-          });
+          if (!sidebarTrigger.getAttribute("data-has-mouseenter")) {
+            sidebarTrigger.addEventListener("mouseenter", () => {
+              sidebar.classList.remove("-translate-x-full");
+            });
+            sidebarTrigger.setAttribute("data-has-mouseenter", "true");
+          }
 
-          sidebar.addEventListener("mouseleave", () => {
-            sidebar.classList.add("-translate-x-full");
-          });
+          if (!sidebar.getAttribute("data-has-mouseleave")) {
+            sidebar.addEventListener("mouseleave", () => {
+              sidebar.classList.add("-translate-x-full");
+            });
+            sidebar.setAttribute("data-has-mouseleave", "true");
+          }
         }
-      }, {
-        once: true,
-        passive: true,
-        capture: true,
       });
     </script>
   </body>

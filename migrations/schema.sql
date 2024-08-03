@@ -106,14 +106,14 @@ CREATE TABLE IF NOT EXISTS "files" (
 "metadata" TEXT NOT NULL,
 "hashes" TEXT NOT NULL,
 "download_url" TEXT NOT NULL,
-"primary" NUMERIC,
+"is_primary" NUMERIC,
 "created_at" DATETIME NOT NULL,
 "updated_at" DATETIME NOT NULL,
 FOREIGN KEY (model_version_id) REFERENCES model_versions (id) ON DELETE cascade
 );
 CREATE TABLE IF NOT EXISTS "images" (
 "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-"model_version_id" INTEGER,
+"model_version_id" INTEGER NOT NULL,
 "url" TEXT NOT NULL,
 "nsfw_level" INTEGER,
 "width" INTEGER,

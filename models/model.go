@@ -13,7 +13,7 @@ import (
 type Model struct {
 	ID                    int             `json:"-" db:"id"`
 	CivitaiID             int             `json:"id" db:"civitai_id"`
-	Name                  string          `json:"name" db:"name"`
+	Name                  *string         `json:"name" db:"name"`
 	Description           *string         `json:"description" db:"description"`
 	AllowNoCredit         bool            `json:"allowNoCredit" db:"allow_no_credit"`
 	AllowDerivatives      bool            `json:"allowDerivatives" db:"allow_derivatives"`
@@ -57,7 +57,7 @@ func (m *Model) UnmarshalJSON(data []byte) error {
 	}
 	m.Tags = make(Tags, len(aux.Tags))
 	for i, tagName := range aux.Tags {
-		m.Tags[i] = Tag{Name: tagName}
+		m.Tags[i] = Tag{Name: &tagName}
 	}
 	return nil
 }

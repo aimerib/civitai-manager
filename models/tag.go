@@ -9,7 +9,7 @@ import (
 
 type Tag struct {
 	ID        int       `json:"-" db:"id"`
-	Name      string    `json:"name" db:"name"`
+	Name      *string   `json:"name" db:"name"`
 	Models    Models    `many_to_many:"model_tags"`
 	CreatedAt time.Time `json:"-" db:"created_at"`
 	UpdatedAt time.Time `json:"-" db:"updated_at"`

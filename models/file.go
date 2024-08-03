@@ -10,20 +10,20 @@ import (
 
 type File struct {
 	ID                int             `json:"-" db:"id"`
-	CivitaiID         int             `json:"id" db:"civitai_id"`
+	CivitaiID         *int            `json:"id" db:"civitai_id"`
 	ModelVersionID    int             `json:"-" db:"model_version_id"`
 	SizeKB            float64         `json:"sizeKB" db:"size_kb"`
-	Name              string          `json:"name" db:"name"`
-	Type              string          `json:"type" db:"type"`
+	Name              *string         `json:"name" db:"name"`
+	Type              *string         `json:"type" db:"type"`
 	PickleScanResult  *string         `json:"pickleScanResult" db:"pickle_scan_result"`
 	PickleScanMessage *string         `json:"pickleScanMessage" db:"pickle_scan_message"`
 	VirusScanResult   *string         `json:"virusScanResult" db:"virus_scan_result"`
 	VirusScanMessage  *string         `json:"virusScanMessage" db:"virus_scan_message"`
-	ScannedAt         *time.Time      `json:"scannedAt" db:"scanned_at"`
+	ScannedAt         time.Time       `json:"scannedAt" db:"scanned_at"`
 	Metadata          json.RawMessage `json:"metadata" db:"metadata"`
 	Hashes            json.RawMessage `json:"hashes" db:"hashes"`
-	DownloadURL       *string         `json:"downloadUrl" db:"download_url"`
-	Primary           bool            `json:"primary" db:"primary"`
+	DownloadURL       string          `json:"downloadUrl" db:"download_url"`
+	IsPrimary         *bool           `json:"primary" db:"is_primary"`
 	CreatedAt         time.Time       `json:"created_at" db:"created_at"`
 	UpdatedAt         time.Time       `json:"updated_at" db:"updated_at"`
 }
@@ -31,9 +31,9 @@ type File struct {
 type Files []File
 
 type FileMetadata struct {
-	FP     *string `json:"fp"`
-	Size   *string `json:"size"`
-	Format *string `json:"format"`
+	FP     string `json:"fp"`
+	Size   string `json:"size"`
+	Format string `json:"format"`
 }
 
 type Hashes struct {

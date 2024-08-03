@@ -101,14 +101,14 @@ create_table("files") {
     t.Column("metadata", "json", {})
     t.Column("hashes", "json", {})
     t.Column("download_url", "string", {})
-    t.Column("primary", "boolean", {null: false})
+    t.Column("is_primary", "boolean", {null: false})
     t.ForeignKey("model_version_id", {"model_versions": ["id"]}, {"on_delete": "cascade"})
     t.Timestamps()
 }
 
 create_table("images") {
     t.Column("id", "integer", {primary: true})
-    t.Column("model_version_id", "integer", {null: false})
+    t.Column("model_version_id", "integer", {})
     t.Column("url", "string", {})
     t.Column("nsfw_level", "integer", {null: false})
     t.Column("width", "integer", {null: false})
