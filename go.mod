@@ -68,7 +68,7 @@ require (
 	github.com/luna-duclos/instrumentedsql v1.1.3 // indirect
 	github.com/mattn/go-colorable v0.1.9 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
-	github.com/mattn/go-sqlite3 v1.14.16 // indirect
+	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.20 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/monoculum/formam v3.5.5+incompatible // indirect

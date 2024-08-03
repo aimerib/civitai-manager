@@ -2,6 +2,7 @@ package actions
 
 import (
 	"net/http"
+	"strings"
 	"sync"
 
 	"civitai/models"
@@ -69,6 +70,8 @@ func App() *buffalo.App {
 		app.GET("/", ModelsIndexHandler)
 		app.GET("/models/{id}", ModelsShowHandler)
 		app.ServeFiles("/", http.FS(public.FS())) // serve files from the public directory
+
+		app.Use(SetLayout)
 	})
 
 	return app
@@ -96,4 +99,15 @@ func forceSSL() buffalo.MiddlewareFunc {
 		SSLRedirect:     ENV == "production",
 		SSLProxyHeaders: map[string]string{"X-Forwarded-Proto": "https"},
 	})
+}
+
+func SetLayout(next buffalo.Handler) buffalo.Handler {
+	return func(c buffalo.Context) error {
+		layout := "application.html"
+		if c.Request().Header.Get("HX-Request") == "true" && strings.Trim(c.Request().RequestURI, "/") != "" {
+			layout = "content.html"
+		}
+		r.HTMLLayout = layout
+		return next(c)
+	}
 }

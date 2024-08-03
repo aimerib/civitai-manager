@@ -37,7 +37,7 @@
           No
         <% } %>
       </p>
-      <p class="mb-4"><strong>Description:</strong> <%= model.Description %></p>
+      <p class="mb-4"><strong>Description:</strong> <%= raw(model.Description) %></p>
 
       <h3 class="text-xl font-semibold mb-2">Creator</h3>
       <p class="mb-2"><strong>Name:</strong> <%= model.Creator.Username %></p>
