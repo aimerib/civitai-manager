@@ -14,7 +14,8 @@ import (
 var _ = grift.Namespace("api", func() {
 	grift.Desc("fetch_models", "Fetch and update models from API. Usage: buffalo task api:fetch_models [limit]")
 	grift.Add("fetch_models", func(c *grift.Context) error {
-		baseURL := "https://civitai.com/api/v1/models?limit=100&types=Checkpoint&tags=nsfw&sort=Newest&nsfw=true&period=AllTime"
+		// baseURL := "https://civitai.com/api/v1/models?limit=100&types=Checkpoint&tags=nsfw&sort=Newest&nsfw=true&period=AllTime"
+		baseURL := "https://civitai.com/api/v1/models?limit=100&types=Checkpoint&sort=Newest&nsfw=false&period=AllTime"
 
 		// Parse the optional limit argument
 		var limit int
@@ -178,7 +179,7 @@ func processCreator(tx *pop.Connection, model *models.Model) error {
 
 func processFiles(tx *pop.Connection, modelVersion *models.ModelVersions) error {
 	for _, file := range modelVersion.Files {
-		file.ModelVersionID = modelVersion.ID
+		file.ModelVersionsID = modelVersion.ID
 		err := tx.Create(&file)
 		if err != nil {
 			return err
@@ -189,7 +190,7 @@ func processFiles(tx *pop.Connection, modelVersion *models.ModelVersions) error 
 
 func processImages(tx *pop.Connection, modelVersion *models.ModelVersions) error {
 	for _, image := range modelVersion.Images {
-		image.ModelVersionID = modelVersion.ID
+		image.ModelVersionsID = modelVersion.ID
 		err := tx.Create(&image)
 		if err != nil {
 			return err
@@ -199,6 +200,6 @@ func processImages(tx *pop.Connection, modelVersion *models.ModelVersions) error
 }
 
 func processModelVersionStats(tx *pop.Connection, modelVersion *models.ModelVersions) error {
-	modelVersion.Stats.ModelVersionID = modelVersion.ID
+	modelVersion.Stats.ModelVersionsID = modelVersion.ID
 	return tx.Create(&modelVersion.Stats)
 }

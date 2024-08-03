@@ -1,13 +1,14 @@
 <div class="mx-auto">
-  <div>davxcvxcv</div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
     <%= for (model) in models { %>
-      <div class="bg-background-card rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105" hx-get="<%= pathFor(model) %>" hx-target="#content" hx-push-url="true" hx-swap="outerHTML">
+      <div class="bg-background-card cursor-pointer rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105" hx-get="<%= pathFor(model) %>" hx-target="#content" hx-push-url="true" hx-swap="innerHTML">
         <div class="relative">
-          <% if (len(model.ModelVersions) > 0 && len(model.ModelVersions[0].Images) > 0) { %>
-            <img src="<%= model.ModelVersions[0].Images[0].URL %>" alt="<%= model.Name %>" class="w-full h-48 object-cover">
+          <%= if ((model.ModelVersions != nil) && (len(model.ModelVersions) > 0) && (len(model.ModelVersions[0].Images) > 0) && (len(model.ModelVersions[0].Images) > 0)) { %>
+            <div class="media-container" data-src="<%= model.ModelVersions[0].Images[0].URL %>" data-alt="<%= model.Name %>">
+              <!-- Content will be inserted here by JavaScript -->
+            </div>
           <% } %>
-          <% if (model.Checked) { %>
+          <%= if (!model.Checked) { %>
             <div class="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />

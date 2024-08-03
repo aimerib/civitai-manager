@@ -39,7 +39,7 @@ FOREIGN KEY (model_id) REFERENCES models (id) ON DELETE cascade
 );
 CREATE TABLE IF NOT EXISTS "model_version_stats" (
 "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-"model_version_id" INTEGER,
+"model_versions_id" INTEGER,
 "download_count" INTEGER,
 "thumbs_up_count" INTEGER,
 "thumbs_down_count" INTEGER,
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS "model_version_stats" (
 "rating" REAL,
 "created_at" DATETIME NOT NULL,
 "updated_at" DATETIME NOT NULL,
-FOREIGN KEY (model_version_id) REFERENCES model_versions (id) ON DELETE cascade
+FOREIGN KEY (model_versions_id) REFERENCES model_versions (id) ON DELETE cascade
 );
 CREATE TABLE IF NOT EXISTS "creators" (
 "id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,7 +94,7 @@ FOREIGN KEY (model_id) REFERENCES models (id) ON DELETE cascade
 CREATE TABLE IF NOT EXISTS "files" (
 "id" INTEGER PRIMARY KEY AUTOINCREMENT,
 "civitai_id" INTEGER,
-"model_version_id" INTEGER,
+"model_versions_id" INTEGER,
 "size_kb" REAL,
 "name" TEXT,
 "type" TEXT,
@@ -109,11 +109,11 @@ CREATE TABLE IF NOT EXISTS "files" (
 "is_primary" NUMERIC,
 "created_at" DATETIME NOT NULL,
 "updated_at" DATETIME NOT NULL,
-FOREIGN KEY (model_version_id) REFERENCES model_versions (id) ON DELETE cascade
+FOREIGN KEY (model_versions_id) REFERENCES model_versions (id) ON DELETE cascade
 );
 CREATE TABLE IF NOT EXISTS "images" (
 "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-"model_version_id" INTEGER NOT NULL,
+"model_versions_id" INTEGER NOT NULL,
 "url" TEXT NOT NULL,
 "nsfw_level" INTEGER,
 "width" INTEGER,
@@ -124,5 +124,5 @@ CREATE TABLE IF NOT EXISTS "images" (
 "on_site" NUMERIC,
 "created_at" DATETIME NOT NULL,
 "updated_at" DATETIME NOT NULL,
-FOREIGN KEY (model_version_id) REFERENCES model_versions (id) ON DELETE cascade
+FOREIGN KEY (model_versions_id) REFERENCES model_versions (id) ON DELETE cascade
 );

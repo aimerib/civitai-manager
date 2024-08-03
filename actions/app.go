@@ -70,7 +70,6 @@ func App() *buffalo.App {
 		app.GET("/", ModelsIndexHandler)
 		app.GET("/models/{id}", ModelsShowHandler)
 		app.ServeFiles("/", http.FS(public.FS())) // serve files from the public directory
-
 		app.Use(SetLayout)
 	})
 

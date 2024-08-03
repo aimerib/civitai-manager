@@ -66,11 +66,9 @@
         <h4 class="text-lg font-semibold mt-4 mb-2">Images</h4>
         <div class="grid grid-cols-2 gap-4">
           <%= for (image) in version.Images { %>
-          <img
-            src="<%= image.URL %>"
-            alt="Model image"
-            class="w-full h-auto rounded"
-          />
+            <div class="media-container w-full h-auto rounded" data-src="<%= image.URL %>" data-alt="<%= model.Name %> - <%= image.Hash %>">
+              <!-- Content will be inserted here by JavaScript -->
+            </div>
           <% } %>
         </div>
       </div>

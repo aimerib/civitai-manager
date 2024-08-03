@@ -11,7 +11,7 @@ import (
 type File struct {
 	ID                int             `json:"-" db:"id"`
 	CivitaiID         *int            `json:"id" db:"civitai_id"`
-	ModelVersionID    int             `json:"-" db:"model_version_id"`
+	ModelVersionsID   int             `json:"-" db:"model_versions_id"`
 	SizeKB            float64         `json:"sizeKB" db:"size_kb"`
 	Name              *string         `json:"name" db:"name"`
 	Type              *string         `json:"type" db:"type"`
@@ -26,6 +26,7 @@ type File struct {
 	IsPrimary         *bool           `json:"primary" db:"is_primary"`
 	CreatedAt         time.Time       `json:"created_at" db:"created_at"`
 	UpdatedAt         time.Time       `json:"updated_at" db:"updated_at"`
+	ModelVersions     ModelVersions   `json:"-" belongs_to:"model_versions"`
 }
 
 type Files []File

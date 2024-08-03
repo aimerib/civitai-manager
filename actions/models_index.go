@@ -24,12 +24,14 @@ func ModelsIndexHandler(c buffalo.Context) error {
 		Where("id IN (SELECT model_id FROM model_versions GROUP BY model_id HAVING MAX(published_at) = published_at)").
 		Order("(SELECT MAX(published_at) FROM model_versions WHERE model_versions.model_id = models.id) DESC").
 		Order("id")
-	err := query.Eager("Creator").Eager("Stats").EagerPreload("ModelVersions").All(&allModels)
+	err := query.Eager("ModelVersions.Images").All(&allModels)
 
 	if err != nil {
 		fmt.Println("Error getting models:", errors.Cause(err))
 		return err
 	}
+
+	// fmt.Println("Retrieved models images:", allModels[0].ModelVersions[0].Images)
 
 	// Make the models available to the view
 	c.Set("models", allModels)

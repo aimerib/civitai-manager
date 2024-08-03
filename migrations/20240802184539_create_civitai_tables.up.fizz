@@ -34,13 +34,13 @@ create_table("stats") {
 
 create_table("model_version_stats") {
     t.Column("id", "integer", {primary: true})
-    t.Column("model_version_id", "integer", {null: false})
+    t.Column("model_versions_id", "integer", {null: false})
     t.Column("download_count", "integer", {null: false})
     t.Column("thumbs_up_count", "integer", {null: false})
     t.Column("thumbs_down_count", "integer", {null: false})
     t.Column("rating_count", "integer", {null: false})
     t.Column("rating", "float", {null: false})
-    t.ForeignKey("model_version_id", {"model_versions": ["id"]}, {"on_delete": "cascade"})
+    t.ForeignKey("model_versions_id", {"model_versions": ["id"]}, {"on_delete": "cascade"})
     t.Timestamps()
 }
 
@@ -89,7 +89,7 @@ create_table("model_versions") {
 create_table("files") {
     t.Column("id", "integer", {primary: true})
     t.Column("civitai_id", "integer", {null: false})
-    t.Column("model_version_id", "integer", {null: false})
+    t.Column("model_versions_id", "integer", {null: false})
     t.Column("size_kb", "float", {null: false})
     t.Column("name", "string", {null: false})
     t.Column("type", "string", {null: false})
@@ -102,13 +102,13 @@ create_table("files") {
     t.Column("hashes", "json", {})
     t.Column("download_url", "string", {})
     t.Column("is_primary", "boolean", {null: false})
-    t.ForeignKey("model_version_id", {"model_versions": ["id"]}, {"on_delete": "cascade"})
+    t.ForeignKey("model_versions_id", {"model_versions": ["id"]}, {"on_delete": "cascade"})
     t.Timestamps()
 }
 
 create_table("images") {
     t.Column("id", "integer", {primary: true})
-    t.Column("model_version_id", "integer", {})
+    t.Column("model_versions_id", "integer", {})
     t.Column("url", "string", {})
     t.Column("nsfw_level", "integer", {null: false})
     t.Column("width", "integer", {null: false})
@@ -117,6 +117,6 @@ create_table("images") {
     t.Column("type", "string", {null: false})
     t.Column("has_meta", "boolean", {null: false})
     t.Column("on_site", "boolean", {null: false})
-    t.ForeignKey("model_version_id", {"model_versions": ["id"]}, {"on_delete": "cascade"})
+    t.ForeignKey("model_versions_id", {"model_versions": ["id"]}, {"on_delete": "cascade"})
     t.Timestamps()
 }
