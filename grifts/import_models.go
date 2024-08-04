@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"civitai/models"
 
@@ -69,8 +70,11 @@ var _ = grift.Namespace("api", func() {
 				}
 
 				modelCount++
-				fmt.Printf("Imported model: %s (ID: %d)\n", model.Name, model.CivitaiID)
-
+				if model.Name != nil {
+					fmt.Printf("Imported model: %s (ID: %d)\n", *model.Name, model.CivitaiID)
+				} else {
+					fmt.Printf("Imported model with no name (ID: %d)\n", model.CivitaiID)
+				}
 				// Check if we've reached the limit
 				if limit > 0 && modelCount >= limit {
 					fmt.Printf("Reached import limit of %d models.\n", limit)
@@ -92,6 +96,11 @@ var _ = grift.Namespace("api", func() {
 })
 
 func processModel(tx *pop.Connection, model *models.Model) error {
+	if model.Description != nil {
+		re := regexp.MustCompile(`\s*id="[^"]*"`)
+		*model.Description = re.ReplaceAllString(*model.Description, "")
+	}
+
 	err := tx.Create(model)
 	if err != nil {
 		return err
