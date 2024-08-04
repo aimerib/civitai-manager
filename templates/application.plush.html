@@ -124,35 +124,54 @@
     <div class="flex">
       <nav
         id="sidebar"
-        class="fixed rounded-e-md max-h-[94%] mt-1 top-0 left-0 top-16 m-height-9 h-screen overscroll-y-auto w-64 bg-gray-800/90 backdrop-blur border-y border-r border-y-slate-700 border-r-slate-700 text-white transform -translate-x-full transition-transform duration-300 ease-in-out z-40"
+        class="fixed rounded-e-md max-h-[94%] mt-1 top-0 left-0 top-16 m-height-9 h-screen overscroll-y-auto w-64 bg-gray-800/90 backdrop-blur border-y border-r border-y-slate-700 border-r-slate-700 text-white transform -translate-x-full transition-transform duration-300 ease-in-out z-30"
       >
-        <ul class="p-4 mt-16">
+        <span>Test</span>
+        <ul class="p-4 mt-16 ml-2 z-50">
           <li class="mb-2">
-            <a href="/" class="block p-2 hover:bg-gray-700 hover:rounded-md">Home</a>
+            <a href="/" class="block p-2 hover:bg-gray-700 hover:rounded-md"
+              >Home</a
+            >
           </li>
           <li class="mb-2">
-            <a href="#" class="block p-2 hover:bg-gray-700 hover:rounded-md">Models</a>
+            <a href="#" class="block p-2 hover:bg-gray-700 hover:rounded-md"
+              >Models</a
+            >
           </li>
           <li class="mb-2">
-            <a href="#" class="block p-2 hover:bg-gray-700 hover:rounded-md">Settings</a>
+            <a href="#" class="block p-2 hover:bg-gray-700 hover:rounded-md"
+              >Settings</a
+            >
           </li>
         </ul>
       </nav>
 
-      <div
-        class="fixed top-0 left-0 w-24 h-full z-30"
-        id="sidebar-trigger"
-      ></div>
+      <div class="fixed top-0 left-0 w-24 h-full z-40 flex justify-center" id="sidebar-trigger">
+        <svg
+          class="w-6 h-6 text-white mt-24 z-50"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          ></path>
+        </svg>
+      </div>
 
-      <main class="container mx-auto mt-20 flex-grow px-24">
+      <main class="container mx-auto mt-20 flex-grow">
         <%= partial("flash.html") %>
-        <div id="content" class="flex-grow p-24" <%= yield %> </div>
+        <div id="content" class="flex-grow p-24" <%= yield %></div>
       </main>
     </div>
 
     <%= javascriptTag("application.js") %>
     <script>
-      htmx.config.globalViewTransitions = true
+      htmx.config.globalViewTransitions = true;
       // const sidebar = document.getElementById("sidebar");
       // const sidebarTrigger = document.getElementById("sidebar-trigger");
 
@@ -186,16 +205,16 @@
 
       function checkMediaType(url, callback) {
         const img = new Image();
-        img.onload = function() {
-          callback('image');
+        img.onload = function () {
+          callback("image");
         };
-        img.onerror = function() {
-          const video = document.createElement('video');
-          video.onloadedmetadata = function() {
-            callback('video');
+        img.onerror = function () {
+          const video = document.createElement("video");
+          video.onloadedmetadata = function () {
+            callback("video");
           };
-          video.onerror = function() {
-            callback('unknown');
+          video.onerror = function () {
+            callback("unknown");
           };
           video.src = url;
         };
@@ -203,15 +222,15 @@
       }
 
       function setupMediaContainers() {
-        const containers = document.querySelectorAll('.media-container');
-        containers.forEach(container => {
+        const containers = document.querySelectorAll(".media-container");
+        containers.forEach((container) => {
           const url = container.dataset.src;
           const alt = container.dataset.alt;
 
-          checkMediaType(url, function(mediaType) {
-            if (mediaType === 'image') {
+          checkMediaType(url, function (mediaType) {
+            if (mediaType === "image") {
               container.innerHTML = `<img src="${url}" alt="${alt}" class="w-full h-48 object-cover">`;
-            } else if (mediaType === 'video') {
+            } else if (mediaType === "video") {
               container.innerHTML = `
                 <video class="w-full h-48 object-cover" controls>
                   <source src="${url}" type="video/mp4">
@@ -224,9 +243,10 @@
           });
         });
       }
-
-      document.addEventListener('DOMContentLoaded', setupMediaContainers);
-      document.body.addEventListener('htmx:afterSettle', setupMediaContainers);
+      htmx.onLoad(setupMediaContainers);
+      //document.addEventListener('DOMContentLoaded', setupMediaContainers);
+      //document.body.addEventListener('htmx:afterSettle', setupMediaContainers);
+      //document.body.addEventListener('htmx:afterSwap', setupMediaContainers);
     </script>
   </body>
 </html>
