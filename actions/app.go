@@ -70,9 +70,11 @@ func App() *buffalo.App {
 
 		app.GET("/", ModelsIndexHandler)
 		app.GET("/models/{id}", ModelsShowHandler)
-		app.ServeFiles("/", http.FS(public.FS())) // serve files from the public directory
+		app.GET("/settings", SettingsHandler)
+		app.POST("/settings/run-fetch-job", RunFetchJobHandler)
 		app.Use(SetLayout)
 		app.Use(CacheMiddleware)
+		app.ServeFiles("/", http.FS(public.FS())) // serve files from the public directory
 	})
 
 	return app

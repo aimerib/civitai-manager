@@ -1,0 +1,34 @@
+<script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/sse.js"></script>
+
+<h1>Settings</h1>
+<button hx-post="/settings/run-fetch-job" hx-target="#status-indicator" hx-swap="innerHTML" hx-headers='{"X-CSRF-Token": "<%= authenticity_token %>"}'>
+    Run Model Fetch
+</button>
+<div id="status-indicator" class="indicator"></div>
+<div hx-ext="sse" sse-connect="/settings/run-fetch-job" sse-swap="message">
+  Waiting for job to start...
+</div>
+<script>
+  htmx.on("htmx:beforeRequest", function(evt) {
+      document.getElementById('status-indicator').classList.add('pulsating', 'red');
+  });
+</script>
+
+<style>
+  .indicator {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: inline-block;
+  }
+  .red { background-color: red; }
+  .green { background-color: green; }
+  .pulsating {
+      animation: pulse 1s infinite;
+  }
+  @keyframes pulse {
+      0% { transform: scale(0.95); }
+      70% { transform: scale(1.1); }
+      100% { transform: scale(0.95); }
+  }
+</style>

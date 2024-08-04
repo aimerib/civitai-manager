@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strconv"
+	"strings"
 
 	"civitai/models"
 
@@ -13,30 +15,31 @@ import (
 )
 
 var _ = grift.Namespace("api", func() {
-	grift.Desc("fetch_models", "Fetch and update models from API. Usage: buffalo task api:fetch_models [limit]")
+	grift.Desc("fetch_models", "Fetch and update models from API. Usage: buffalo task api:fetch_models [--pages=N] [--per_page=N] [--limit=N]")
 	grift.Add("fetch_models", func(c *grift.Context) error {
-		// baseURL := "https://civitai.com/api/v1/models?limit=100&types=Checkpoint&tags=nsfw&sort=Newest&nsfw=true&period=AllTime"
-		baseURL := "https://civitai.com/api/v1/models?limit=100&types=Checkpoint&sort=Newest&nsfw=false&period=AllTime"
+		baseURL := "https://civitai.com/api/v1/models?types=Checkpoint&sort=Newest&nsfw=false&period=AllTime"
 
-		// Parse the optional limit argument
-		var limit int
-		if len(c.Args) > 0 {
-			_, err := fmt.Sscanf(c.Args[0], "%d", &limit)
-			if err != nil {
-				return fmt.Errorf("invalid limit argument: please provide a number")
-			}
+		pages := getIntArg(c, "pages", 0)
+		perPage := getIntArg(c, "per_page", 0)
+		limit := getIntArg(c, "limit", 0)
+
+		if limit == 0 && pages > 0 && perPage > 0 {
+			limit = pages * perPage
 		}
 
-		// Get database connection
+		if perPage > 0 {
+			baseURL += fmt.Sprintf("&limit=%d", perPage)
+		}
+
 		tx, err := pop.Connect("development")
 		if err != nil {
 			return err
 		}
 
 		modelCount := 0
+		pageCount := 0
 
 		for url := baseURL; url != ""; {
-			// Fetch JSON data
 			resp, err := http.Get(url)
 			if err != nil {
 				return err
@@ -55,13 +58,11 @@ var _ = grift.Namespace("api", func() {
 				return err
 			}
 
-			// Process each model
 			for _, model := range response.Items {
 				existingModel := models.Model{}
 				err := tx.Where("civitai_id = ?", model.CivitaiID).First(&existingModel)
 				if err == nil {
-					// Model already exists, skip processing
-					return nil
+					continue
 				}
 
 				err = processModel(tx, &model)
@@ -75,14 +76,19 @@ var _ = grift.Namespace("api", func() {
 				} else {
 					fmt.Printf("Imported model with no name (ID: %d)\n", model.CivitaiID)
 				}
-				// Check if we've reached the limit
+
 				if limit > 0 && modelCount >= limit {
 					fmt.Printf("Reached import limit of %d models.\n", limit)
 					return nil
 				}
 			}
 
-			// Set next page URL
+			pageCount++
+			if pages > 0 && pageCount >= pages {
+				fmt.Printf("Reached page limit of %d pages.\n", pages)
+				break
+			}
+
 			if response.Metadata.NextPage != nil {
 				url = *response.Metadata.NextPage
 			} else {
@@ -90,7 +96,7 @@ var _ = grift.Namespace("api", func() {
 			}
 		}
 
-		fmt.Printf("Imported a total of %d models.\n", modelCount)
+		fmt.Printf("Imported a total of %d models across %d pages.\n", modelCount, pageCount)
 		return nil
 	})
 })
@@ -211,4 +217,31 @@ func processImages(tx *pop.Connection, modelVersion *models.ModelVersions) error
 func processModelVersionStats(tx *pop.Connection, modelVersion *models.ModelVersions) error {
 	modelVersion.Stats.ModelVersionsID = modelVersion.ID
 	return tx.Create(&modelVersion.Stats)
+}
+
+// Helper function to parse integer arguments
+func getIntArg(c *grift.Context, name string, defaultValue int) int {
+	// Check if the value is in the args
+	for _, arg := range c.Args {
+		if strings.HasPrefix(arg, "--"+name+"=") {
+			value := strings.TrimPrefix(arg, "--"+name+"=")
+			if parsed, err := strconv.Atoi(value); err == nil {
+				return parsed
+			}
+		}
+	}
+
+	// If not in args, check the context
+	if contextValue, ok := c.Value("args").([]string); ok {
+		for _, arg := range contextValue {
+			if strings.HasPrefix(arg, "--"+name+"=") {
+				value := strings.TrimPrefix(arg, "--"+name+"=")
+				if parsed, err := strconv.Atoi(value); err == nil {
+					return parsed
+				}
+			}
+		}
+	}
+
+	return defaultValue
 }
