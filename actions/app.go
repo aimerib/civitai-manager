@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 	"sync"
@@ -71,6 +72,7 @@ func App() *buffalo.App {
 		app.GET("/models/{id}", ModelsShowHandler)
 		app.ServeFiles("/", http.FS(public.FS())) // serve files from the public directory
 		app.Use(SetLayout)
+		app.Use(CacheMiddleware)
 	})
 
 	return app
@@ -107,6 +109,16 @@ func SetLayout(next buffalo.Handler) buffalo.Handler {
 			layout = "content.html"
 		}
 		r.HTMLLayout = layout
+		return next(c)
+	}
+}
+
+func CacheMiddleware(next buffalo.Handler) buffalo.Handler {
+	return func(c buffalo.Context) error {
+		if strings.HasPrefix(c.Request().URL.Path, "/images/") {
+			fmt.Println("Cache images")
+			c.Response().Header().Set("Cache-Control", "public, max-age=31536000")
+		}
 		return next(c)
 	}
 }

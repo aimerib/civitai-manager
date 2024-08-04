@@ -165,85 +165,13 @@
 
       <main class="container mx-auto mt-20 flex-grow">
         <%= partial("flash.html") %>
-        <div id="content" class="flex-grow p-24" <%= yield %></div>
+        <div id="content" class="flex-grow p-24"><%= yield %></div>
       </main>
     </div>
 
     <%= javascriptTag("application.js") %>
     <script>
-      htmx.config.globalViewTransitions = true;
-      // const sidebar = document.getElementById("sidebar");
-      // const sidebarTrigger = document.getElementById("sidebar-trigger");
 
-      // sidebarTrigger.addEventListener("mouseenter", () => {
-      //   sidebar.classList.remove("-translate-x-full");
-      // });
-
-      // sidebar.addEventListener("mouseleave", () => {
-      //   sidebar.classList.add("-translate-x-full");
-      // });
-      htmx.onLoad(function () {
-        const sidebar = document.getElementById("sidebar");
-        const sidebarTrigger = document.getElementById("sidebar-trigger");
-
-        if (sidebar && sidebarTrigger) {
-          if (!sidebarTrigger.getAttribute("data-has-mouseenter")) {
-            sidebarTrigger.addEventListener("mouseenter", () => {
-              sidebar.classList.remove("-translate-x-full");
-            });
-            sidebarTrigger.setAttribute("data-has-mouseenter", "true");
-          }
-
-          if (!sidebar.getAttribute("data-has-mouseleave")) {
-            sidebar.addEventListener("mouseleave", () => {
-              sidebar.classList.add("-translate-x-full");
-            });
-            sidebar.setAttribute("data-has-mouseleave", "true");
-          }
-        }
-      });
-
-      function checkMediaType(url, callback) {
-        const img = new Image();
-        img.onload = function () {
-          callback("image");
-        };
-        img.onerror = function () {
-          const video = document.createElement("video");
-          video.onloadedmetadata = function () {
-            callback("video");
-          };
-          video.onerror = function () {
-            callback("unknown");
-          };
-          video.src = url;
-        };
-        img.src = url;
-      }
-
-      function setupMediaContainers() {
-        const containers = document.querySelectorAll(".media-container");
-        containers.forEach((container) => {
-          const url = container.dataset.src;
-          const alt = container.dataset.alt;
-
-          checkMediaType(url, function (mediaType) {
-            if (mediaType === "image") {
-              container.innerHTML = `<img src="${url}" alt="${alt}" class="w-full h-48 object-cover">`;
-            } else if (mediaType === "video") {
-              container.innerHTML = `
-                <video class="w-full h-48 object-cover" controls>
-                  <source src="${url}" type="video/mp4">
-                  Your browser does not support the video tag.
-                </video>
-              `;
-            } else {
-              container.innerHTML = `<p>Unsupported media type</p>`;
-            }
-          });
-        });
-      }
-      htmx.onLoad(setupMediaContainers);
       //document.addEventListener('DOMContentLoaded', setupMediaContainers);
       //document.body.addEventListener('htmx:afterSettle', setupMediaContainers);
       //document.body.addEventListener('htmx:afterSwap', setupMediaContainers);
