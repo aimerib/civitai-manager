@@ -1,5 +1,5 @@
 htmx.config.globalViewTransitions = true;
-htmx.logAll();
+// htmx.logAll();
 
 
 function setupSidebar() {

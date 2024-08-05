@@ -11,6 +11,7 @@ import (
 
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo-pop/v3/pop/popmw"
+	"github.com/gobuffalo/buffalo/worker"
 	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/middleware/csrf"
 	"github.com/gobuffalo/middleware/forcessl"
@@ -22,6 +23,7 @@ import (
 // ENV is used to help switch settings based on where the
 // application is being run. Default is "development".
 var ENV = envy.Get("GO_ENV", "development")
+var w worker.Worker
 
 var (
 	app     *buffalo.App
@@ -63,34 +65,24 @@ func App() *buffalo.App {
 		//   c.Value("tx").(*pop.Connection)
 		// Remove to disable this.
 		app.Use(popmw.Transaction(models.DB))
-		// Setup and use translations:
-		// app.Use(translations())
 
 		app.GET("/routes", HomeHandler)
 
 		app.GET("/", ModelsIndexHandler)
 		app.GET("/models/{id}", ModelsShowHandler)
 		app.GET("/settings", SettingsHandler)
-		app.POST("/settings/run-fetch-job", RunFetchJobHandler)
+		app.POST("/settings/run-fetch-job", StartBackgroundFetchJob)
+		app.GET("/flash-partial/{taskID}", FlashHandler)
+		app.GET("/ws/{taskID}", WebSocketHandler)
 		app.Use(SetLayout)
 		app.Use(CacheMiddleware)
+		w = app.Worker
+		app.Use(RegisterWorkersMiddleware)
 		app.ServeFiles("/", http.FS(public.FS())) // serve files from the public directory
 	})
 
 	return app
 }
-
-// translations will load locale files, set up the translator `actions.T`,
-// and will return a middleware to use to load the correct locale for each
-// request.
-// for more information: https://gobuffalo.io/en/docs/localization
-// func translations() buffalo.MiddlewareFunc {
-// 	var err error
-// 	if T, err = i18n.New(locales.FS(), "en-US"); err != nil {
-// 		app.Stop(err)
-// 	}
-// 	return T.Middleware()
-// }
 
 // forceSSL will return a middleware that will redirect an incoming request
 // if it is not HTTPS. "http://example.com" => "https://example.com".
@@ -121,6 +113,13 @@ func CacheMiddleware(next buffalo.Handler) buffalo.Handler {
 			fmt.Println("Cache images")
 			c.Response().Header().Set("Cache-Control", "public, max-age=31536000")
 		}
+		return next(c)
+	}
+}
+
+func RegisterWorkersMiddleware(next buffalo.Handler) buffalo.Handler {
+	return func(c buffalo.Context) error {
+		RegisterModelFetchWorkers(w, c)
 		return next(c)
 	}
 }
