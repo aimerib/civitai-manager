@@ -31,8 +31,6 @@ func ModelsIndexHandler(c buffalo.Context) error {
 		return err
 	}
 
-	// fmt.Println("Retrieved models images:", allModels[0].ModelVersions[0].Images)
-
 	// Make the models available to the view
 	c.Set("models", allModels)
 

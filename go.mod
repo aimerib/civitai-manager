@@ -11,18 +11,11 @@ require (
 	github.com/gobuffalo/pop/v6 v6.1.1
 	github.com/gobuffalo/suite/v4 v4.0.4
 	github.com/gobuffalo/validate/v3 v3.3.3
-	github.com/gofrs/uuid v4.3.1+incompatible
+	github.com/pkg/errors v0.9.1
 	github.com/unrolled/secure v1.15.0
 )
 
-require (
-	github.com/cockroachdb/cockroach-go v2.0.1+incompatible // indirect
-	github.com/gobuffalo/genny v0.6.0 // indirect
-	github.com/gobuffalo/packd v1.0.2 // indirect
-	github.com/gobuffalo/validate v2.0.4+incompatible // indirect
-	github.com/lib/pq v1.10.7 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
-)
+require github.com/gofrs/uuid v4.3.1+incompatible // indirect
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
@@ -39,13 +32,12 @@ require (
 	github.com/gobuffalo/fizz v1.14.4 // indirect
 	github.com/gobuffalo/flect v1.0.0 // indirect
 	github.com/gobuffalo/github_flavored_markdown v1.1.3 // indirect
-	github.com/gobuffalo/helpers v0.6.7 // indirect
+	github.com/gobuffalo/helpers v0.6.7
 	github.com/gobuffalo/httptest v1.5.2 // indirect
 	github.com/gobuffalo/logger v1.0.7 // indirect
 	github.com/gobuffalo/meta v0.3.3 // indirect
-	github.com/gobuffalo/nulls v0.4.2 // indirect
+	github.com/gobuffalo/nulls v0.4.2
 	github.com/gobuffalo/plush/v4 v4.1.18 // indirect
-	github.com/gobuffalo/pop v4.13.1+incompatible
 	github.com/gobuffalo/refresh v1.13.3 // indirect
 	github.com/gobuffalo/tags/v3 v3.1.4 // indirect
 	github.com/google/uuid v1.6.0
@@ -54,7 +46,6 @@ require (
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/gorilla/sessions v1.2.1 // indirect
-	github.com/gorilla/websocket v1.5.3
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.13.0 // indirect

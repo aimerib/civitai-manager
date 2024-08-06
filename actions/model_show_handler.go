@@ -16,11 +16,8 @@ func ModelsShowHandler(c buffalo.Context) error {
 	}
 
 	id := c.Param("id")
-	c.Logger().Infof("Fetching model with ID: %s", id)
 
 	model := models.Model{}
-
-	c.Logger().Info("Starting database query")
 
 	err := tx.Find(&model, id)
 	if err != nil {
@@ -53,27 +50,8 @@ func ModelsShowHandler(c buffalo.Context) error {
 		}
 	}
 
-	c.Logger().Infof("Retrieved model: %+v", model)
+	c.Logger().Infof("Retrieved model with civitai-id: %+v", model.CivitaiID)
 	c.Set("model", model)
 
 	return c.Render(http.StatusOK, r.HTML("models/show.html"))
-
-	// err := tx.Where("id = ?", id).
-	// 	EagerPreload("Creator").
-	// 	EagerPreload("Stats").
-	// 	EagerPreload("ModelVersions.Images").
-	// 	EagerPreload("ModelVersions.Files").
-	// 	First(&model)
-
-	// if err != nil {
-	// 	c.Logger().Errorf("Error fetching model: %v", err)
-	// 	return c.Error(404, fmt.Errorf("models.Model with ID=%s not found. Error: %s", id, err))
-	// }
-
-	// c.Logger().Infof("Retrieved model: %+v", model)
-	// c.Logger().Infof("Model Versions: %+v", model.ModelVersions)
-
-	// c.Set("model", model)
-
-	// return c.Render(http.StatusOK, r.HTML("models/show.html"))
 }

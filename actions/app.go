@@ -1,7 +1,6 @@
 package actions
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 	"sync"
@@ -110,7 +109,6 @@ func SetLayout(next buffalo.Handler) buffalo.Handler {
 func CacheMiddleware(next buffalo.Handler) buffalo.Handler {
 	return func(c buffalo.Context) error {
 		if strings.HasPrefix(c.Request().URL.Path, "/images/") {
-			fmt.Println("Cache images")
 			c.Response().Header().Set("Cache-Control", "public, max-age=31536000")
 		}
 		return next(c)
