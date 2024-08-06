@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"civitai-manager/middleware"
 	"civitai-manager/models"
 	"net/http"
 
@@ -8,18 +9,16 @@ import (
 	"gorm.io/gorm"
 )
 
-type ModelHandler struct {
-	DB *gorm.DB
-}
+type ModelHandler struct{}
 
-func NewModelHandler(db *gorm.DB) *ModelHandler {
-	return &ModelHandler{DB: db}
+func NewModelHandler() *ModelHandler {
+	return &ModelHandler{}
 }
 
 func (h *ModelHandler) ModelsIndex(c *gin.Context) {
 	var allModels []models.Model
-
-	err := h.DB.
+	db := middleware.GetTrx(c)
+	err := db.
 		Preload("ModelVersions.Images").
 		Joins("JOIN model_versions ON models.id = model_versions.model_id").
 		Group("models.id").
@@ -39,9 +38,9 @@ func (h *ModelHandler) ModelsIndex(c *gin.Context) {
 
 func (h *ModelHandler) ModelsShow(c *gin.Context) {
 	id := c.Param("id")
-
+	db := middleware.GetTrx(c)
 	var model models.Model
-	err := h.DB.
+	err := db.
 		Preload("Creator").
 		Preload("Stats").
 		Preload("ModelVersions.Images").
