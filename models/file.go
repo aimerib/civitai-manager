@@ -4,32 +4,28 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/gobuffalo/pop/v6"
-	"github.com/gobuffalo/validate/v3"
+	"gorm.io/gorm"
 )
 
 type File struct {
-	ID                int             `json:"-" db:"id"`
-	CivitaiID         *int            `json:"id" db:"civitai_id"`
-	ModelVersionsID   int             `json:"-" db:"model_versions_id"`
-	SizeKB            float64         `json:"sizeKB" db:"size_kb"`
-	Name              *string         `json:"name" db:"name"`
-	Type              *string         `json:"type" db:"type"`
-	PickleScanResult  *string         `json:"pickleScanResult" db:"pickle_scan_result"`
-	PickleScanMessage *string         `json:"pickleScanMessage" db:"pickle_scan_message"`
-	VirusScanResult   *string         `json:"virusScanResult" db:"virus_scan_result"`
-	VirusScanMessage  *string         `json:"virusScanMessage" db:"virus_scan_message"`
-	ScannedAt         time.Time       `json:"scannedAt" db:"scanned_at"`
-	Metadata          json.RawMessage `json:"metadata" db:"metadata"`
-	Hashes            json.RawMessage `json:"hashes" db:"hashes"`
-	DownloadURL       string          `json:"downloadUrl" db:"download_url"`
-	IsPrimary         *bool           `json:"primary" db:"is_primary"`
-	CreatedAt         time.Time       `json:"created_at" db:"created_at"`
-	UpdatedAt         time.Time       `json:"updated_at" db:"updated_at"`
-	ModelVersions     ModelVersions   `json:"-" belongs_to:"model_versions"`
+	ID                uint            `gorm:"primaryKey" json:"-"`
+	CivitaiID         *int            `json:"id"`
+	ModelVersionID    uint            `gorm:"index" json:"-"`
+	SizeKB            float64         `json:"sizeKB"`
+	Name              *string         `json:"name"`
+	Type              *string         `json:"type"`
+	PickleScanResult  *string         `json:"pickleScanResult"`
+	PickleScanMessage *string         `json:"pickleScanMessage"`
+	VirusScanResult   *string         `json:"virusScanResult"`
+	VirusScanMessage  *string         `json:"virusScanMessage"`
+	ScannedAt         time.Time       `json:"scannedAt"`
+	Metadata          json.RawMessage `gorm:"type:json" json:"metadata"`
+	Hashes            json.RawMessage `gorm:"type:json" json:"hashes"`
+	DownloadURL       string          `json:"downloadUrl"`
+	IsPrimary         *bool           `json:"primary"`
+	CreatedAt         time.Time       `json:"created_at"`
+	UpdatedAt         time.Time       `json:"updated_at"`
 }
-
-type Files []File
 
 type FileMetadata struct {
 	FP     string `json:"fp"`
@@ -44,6 +40,25 @@ type Hashes struct {
 	BLAKE3 string `json:"BLAKE3"`
 }
 
-func (f *File) Validate(tx *pop.Connection) (*validate.Errors, error) {
-	return validate.NewErrors(), nil
+func (f *File) BeforeCreate(tx *gorm.DB) (err error) {
+	f.CreatedAt = time.Now()
+	f.UpdatedAt = time.Now()
+	return
+}
+
+func (f *File) BeforeUpdate(tx *gorm.DB) (err error) {
+	f.UpdatedAt = time.Now()
+	return
+}
+
+func (f *File) GetMetadata() (FileMetadata, error) {
+	var metadata FileMetadata
+	err := json.Unmarshal(f.Metadata, &metadata)
+	return metadata, err
+}
+
+func (f *File) GetHashes() (Hashes, error) {
+	var hashes Hashes
+	err := json.Unmarshal(f.Hashes, &hashes)
+	return hashes, err
 }

@@ -1,17 +1,32 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type ModelVersionStat struct {
-	ID              int       `json:"-" db:"id"`
-	DownloadCount   int       `json:"downloadCount" db:"download_count"`
-	RatingCount     int       `json:"ratingCount" db:"rating_count"`
-	Rating          float64   `json:"rating" db:"rating"`
-	ThumbsUpCount   int       `json:"thumbsUpCount" db:"thumbs_up_count"`
-	ThumbsDownCount int       `json:"thumbsDownCount" db:"thumbs_down_count"`
-	ModelVersionsID int       `json:"-" db:"model_versions_id"`
-	CreatedAt       time.Time `jjson:"-" db:"created_at"`
-	UpdatedAt       time.Time `json:"-" db:"updated_at"`
+	ID              uint      `gorm:"primaryKey" json:"-"`
+	DownloadCount   int       `json:"downloadCount"`
+	RatingCount     int       `json:"ratingCount"`
+	Rating          float64   `json:"rating"`
+	ThumbsUpCount   int       `json:"thumbsUpCount"`
+	ThumbsDownCount int       `json:"thumbsDownCount"`
+	ModelVersionID  uint      `gorm:"uniqueIndex" json:"-"`
+	CreatedAt       time.Time `json:"-"`
+	UpdatedAt       time.Time `json:"-"`
+
+	// ModelVersion ModelVersion `gorm:"foreignKey:ModelVersionID" json:"-"`
 }
 
-type ModelVersionStats []ModelVersionStat
+func (mvs *ModelVersionStat) BeforeCreate(tx *gorm.DB) (err error) {
+	mvs.CreatedAt = time.Time{}
+	mvs.UpdatedAt = time.Now()
+	return
+}
+
+func (mvs *ModelVersionStat) BeforeUpdate(tx *gorm.DB) (err error) {
+	mvs.UpdatedAt = time.Now()
+	return
+}

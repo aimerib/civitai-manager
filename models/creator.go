@@ -3,21 +3,27 @@ package models
 import (
 	"time"
 
-	"github.com/gobuffalo/pop/v6"
-	"github.com/gobuffalo/validate/v3"
+	"gorm.io/gorm"
 )
 
 type Creator struct {
-	ID        int       `db:"id"`
-	Username  *string   `json:"username" db:"username"`
-	Image     *string   `json:"image" db:"image"`
-	ModelID   int       `db:"model_id"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+	ID        uint      `gorm:"primaryKey" json:"-"`
+	Username  *string   `json:"username"`
+	Image     *string   `json:"image"`
+	ModelID   uint      `json:"-"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+
+	// Model Model `gorm:"foreignKey:ModelID" json:"-"`
 }
 
-type Creators []Creator
+func (c *Creator) BeforeCreate(tx *gorm.DB) (err error) {
+	c.CreatedAt = time.Now()
+	c.UpdatedAt = time.Now()
+	return
+}
 
-func (c *Creator) Validate(tx *pop.Connection) (*validate.Errors, error) {
-	return validate.NewErrors(), nil
+func (c *Creator) BeforeUpdate(tx *gorm.DB) (err error) {
+	c.UpdatedAt = time.Now()
+	return
 }

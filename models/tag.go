@@ -3,30 +3,31 @@ package models
 import (
 	"time"
 
-	"github.com/gobuffalo/pop/v6"
-	"github.com/gobuffalo/validate/v3"
+	"gorm.io/gorm"
 )
 
 type Tag struct {
-	ID        int       `json:"-" db:"id"`
-	Name      *string   `json:"name" db:"name"`
-	Models    Models    `many_to_many:"model_tags"`
-	CreatedAt time.Time `json:"-" db:"created_at"`
-	UpdatedAt time.Time `json:"-" db:"updated_at"`
+	ID        uint      `gorm:"primaryKey" json:"-"`
+	Name      *string   `gorm:"uniqueIndex" json:"name"`
+	Models    []Model   `gorm:"many2many:model_tags;" json:"-"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
 }
 
 type Tags []Tag
 
-func (t *Tag) Validate(tx *pop.Connection) (*validate.Errors, error) {
-	return validate.NewErrors(), nil
+func (t *Tag) BeforeCreate(tx *gorm.DB) (err error) {
+	t.CreatedAt = time.Now()
+	t.UpdatedAt = time.Now()
+	return
 }
 
-func (t *Tag) FindOrCreate(tx *pop.Connection) error {
-	existing := &Tag{}
-	err := tx.Where("name = ?", t.Name).First(existing)
-	if err == nil {
-		*t = *existing
-		return nil
-	}
-	return tx.Create(t)
+func (t *Tag) BeforeUpdate(tx *gorm.DB) (err error) {
+	t.UpdatedAt = time.Now()
+	return
+}
+
+func (t *Tag) FindOrCreate(db *gorm.DB) error {
+	result := db.Where("name = ?", t.Name).FirstOrCreate(t)
+	return result.Error
 }

@@ -1,86 +1,81 @@
 package models
 
 import (
+	"database/sql/driver"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"time"
 
-	"github.com/gobuffalo/nulls"
-	"github.com/gobuffalo/pop/v6"
-	"github.com/gobuffalo/validate/v3"
+	"gorm.io/gorm"
 )
 
 type Model struct {
-	ID                    int             `json:"-" db:"id"`
-	CivitaiID             int             `json:"id" db:"civitai_id"`
-	Name                  *string         `json:"name" db:"name"`
-	Description           *string         `json:"description" db:"description"`
-	AllowNoCredit         bool            `json:"allowNoCredit" db:"allow_no_credit"`
-	AllowDerivatives      bool            `json:"allowDerivatives" db:"allow_derivatives"`
-	AllowDifferentLicense bool            `json:"allowDifferentLicense" db:"allow_different_license"`
-	AllowCommericalUse    json.RawMessage `json:"allowCommercialUse" db:"allow_commercial_use"`
-	Type                  string          `json:"type" db:"type"`
-	Minor                 bool            `json:"minor" db:"minor"`
-	Poi                   bool            `json:"poi" db:"poi"`
-	Nsfw                  bool            `json:"nsfw" db:"nsfw"`
-	NsfwLevel             int             `json:"nsfwLevel" db:"nsfw_level"`
-	Cosmetic              nulls.String    `json:"cosmetic" db:"cosmetic"`
-	CreatedAt             time.Time       `json:"-" db:"created_at"`
-	UpdatedAt             time.Time       `json:"-" db:"updated_at"`
-	ModelVersions         []ModelVersions `json:"modelVersions" has_many:"model_versions"`
-	Stats                 Stat            `json:"stats" has_one:"stat"`
-	Creator               Creator         `json:"creator" has_one:"creator"`
-	Tags                  Tags            `json:"-" many_to_many:"model_tags" db:"-"`
-	Checked               bool            `json:"-" db:"checked"`
+	ID                    uint           `gorm:"primaryKey" json:"-"`
+	CivitaiID             int            `gorm:"uniqueIndex" json:"id"`
+	Name                  *string        `json:"name"`
+	Description           *string        `json:"description"`
+	AllowNoCredit         bool           `json:"allowNoCredit"`
+	AllowDerivatives      bool           `json:"allowDerivatives"`
+	AllowDifferentLicense bool           `json:"allowDifferentLicense"`
+	AllowCommericalUse    CommercialUse  `gorm:"type:json" json:"allowCommercialUse"`
+	Type                  string         `json:"type"`
+	Minor                 bool           `json:"minor"`
+	Poi                   bool           `json:"poi"`
+	Nsfw                  bool           `json:"nsfw"`
+	NsfwLevel             int            `json:"nsfwLevel"`
+	Cosmetic              *string        `json:"cosmetic"`
+	CreatedAt             time.Time      `json:"-"`
+	UpdatedAt             time.Time      `json:"-"`
+	ModelVersions         []ModelVersion `gorm:"foreignKey:ModelID" json:"modelVersions"`
+	Stats                 Stat           `gorm:"foreignKey:ModelID" json:"stats"`
+	Creator               Creator        `gorm:"foreignKey:ModelID" json:"creator"`
+	Tags                  []Tag          `gorm:"many2many:model_tags;" json:"tags"`
+	Checked               bool           `json:"-"`
 }
 
-type Models []Model
+type CommercialUse []string
 
-func (m *Model) Validate(tx *pop.Connection) (*validate.Errors, error) {
-	return validate.NewErrors(), nil
-}
-
-func (m *Model) FindByCivitaiID(tx *pop.Connection, id int) error {
-	return tx.Where("civitai_id = ?", id).First(m)
-}
-
-func (m *Model) UnmarshalJSON(data []byte) error {
-	type Alias Model // Create an alias to avoid recursive UnmarshalJSON calls
-	aux := &struct {
-		*Alias
-		Tags []string `json:"tags"`
-	}{
-		Alias: (*Alias)(m),
+func (cu *CommercialUse) Scan(value interface{}) error {
+	bytes, ok := value.([]byte)
+	if !ok {
+		return errors.New("type assertion to []byte failed")
 	}
-	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
-	}
-	m.Tags = make(Tags, len(aux.Tags))
-	for i, tagName := range aux.Tags {
-		m.Tags[i] = Tag{Name: &tagName}
-	}
-	return nil
+
+	return json.Unmarshal(bytes, &cu)
 }
 
-func (m *Model) SaveWithTags(tx *pop.Connection) error {
-	return tx.Transaction(func(tx *pop.Connection) error {
-		// Save the model first
-		if err := tx.Create(m); err != nil {
-			return fmt.Errorf("error saving model: %w", err)
+func (cu CommercialUse) Value() (driver.Value, error) {
+	return json.Marshal(cu)
+}
+
+func (m *Model) BeforeCreate(tx *gorm.DB) (err error) {
+	m.CreatedAt = time.Now()
+	m.UpdatedAt = time.Now()
+	return
+}
+
+func (m *Model) BeforeUpdate(tx *gorm.DB) (err error) {
+	m.UpdatedAt = time.Now()
+	return
+}
+
+func (m *Model) FindByCivitaiID(db *gorm.DB, id int) error {
+	return db.Where("civitai_id = ?", id).First(m).Error
+}
+
+func (m *Model) SaveWithTags(db *gorm.DB) error {
+	return db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(m).Error; err != nil {
+			return err
 		}
 
-		// Now handle the tags
 		for _, tag := range m.Tags {
-			if err := tag.FindOrCreate(tx); err != nil {
-				return fmt.Errorf("error finding or creating tag: %w", err)
+			if err := tx.FirstOrCreate(&tag, Tag{Name: tag.Name}).Error; err != nil {
+				return err
 			}
 
-			modelTag := ModelTag{
-				ModelID: m.ID,
-				TagID:   tag.ID,
-			}
-			if err := tx.Create(&modelTag); err != nil {
-				return fmt.Errorf("error creating model_tag association: %w", err)
+			if err := tx.Model(m).Association("Tags").Append(&tag); err != nil {
+				return err
 			}
 		}
 
