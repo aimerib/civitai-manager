@@ -1,4 +1,5 @@
 htmx.config.globalViewTransitions = true;
+// htmx.logAll();
 
 function setupSidebar() {
   const sidebar = document.getElementById("sidebar");
@@ -22,3 +23,20 @@ function setupSidebar() {
 }
 
 htmx.onLoad(setupSidebar);
+
+document.addEventListener("alpine:init", () => {
+  Alpine.store("sidebar", {
+    open: false,
+    toggle() {
+      this.open = !this.open;
+    },
+  });
+});
+
+document.body.addEventListener("htmx:afterSettle", (event) => {
+  Alpine.initTree(document.body);
+});
+
+document.body.addEventListener("htmx:historyRestore", (event) => {
+  Alpine.initTree(document.body);
+});

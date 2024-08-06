@@ -138,58 +138,80 @@
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const mediaContainers = document.querySelectorAll(".media-container");
-    const fullscreenViewer = document.getElementById("fullscreen-viewer");
-    const fullscreenImage = document.getElementById("fullscreen-image");
-    const closeViewer = document.getElementById("close-viewer");
+  (function () {
+    function initializeModelPage() {
+      const mediaContainers = document.querySelectorAll(".media-container");
+      const fullscreenViewer = document.getElementById("fullscreen-viewer");
+      const fullscreenImage = document.getElementById("fullscreen-image");
+      const closeViewer = document.getElementById("close-viewer");
 
-    mediaContainers.forEach((container) => {
-      console.log(container)
-      const img = document.createElement("img");
-      img.src = container.dataset.src;
-      img.alt = container.dataset.alt;
-      img.className =
-        "w-full h-auto object-cover rounded-md transition-opacity duration-300 opacity-0 cursor-pointer";
-      img.onload = () => img.classList.remove("opacity-0");
-      //container.appendChild(img);
-      while (container.firstChild) {
-        container.removeChild(container.firstChild);
+      function loadImages() {
+        mediaContainers.forEach((container) => {
+          const img = document.createElement("img");
+          img.src = container.dataset.src;
+          img.alt = container.dataset.alt;
+          img.className =
+            "w-full h-auto object-cover rounded-md transition-opacity duration-300 opacity-0 cursor-pointer";
+          img.onload = () => img.classList.remove("opacity-0");
+          while (container.firstChild) {
+            container.removeChild(container.firstChild);
+          }
+          container.appendChild(img);
+
+          const handleImageClick = (e) => {
+            e.preventDefault();
+            openFullscreenViewer(img);
+          };
+
+          img.addEventListener("click", handleImageClick);
+          img.addEventListener("touchend", handleImageClick);
+        });
       }
-      container.appendChild(img);
 
-      // Add click event to open fullscreen viewer
-      img.addEventListener("click", () => {
+      function openFullscreenViewer(img) {
         fullscreenImage.src = img.src;
         fullscreenImage.alt = img.alt;
         fullscreenViewer.classList.remove("hidden");
-        document.body.style.overflow = "hidden"; // Prevent scrolling
-      });
-    });
-
-    // Close viewer when clicking the close button
-    closeViewer.addEventListener("click", () => {
-      fullscreenViewer.classList.add("hidden");
-      document.body.style.overflow = ""; // Restore scrolling
-    });
-
-    // Close viewer when clicking outside the image
-    fullscreenViewer.addEventListener("click", (e) => {
-      if (e.target === fullscreenViewer) {
-        fullscreenViewer.classList.add("hidden");
-        document.body.style.overflow = ""; // Restore scrolling
+        document.body.style.overflow = "hidden";
       }
-    });
 
-    // Close viewer when pressing the Escape key
-    document.addEventListener("keydown", (e) => {
-      if (
-        e.key === "Escape" &&
-        !fullscreenViewer.classList.contains("hidden")
-      ) {
+      function closeFullscreenViewer() {
         fullscreenViewer.classList.add("hidden");
-        document.body.style.overflow = ""; // Restore scrolling
+        document.body.style.overflow = "";
       }
-    });
-  });
+
+      function handleOutsideClick(e) {
+        if (e.target === fullscreenViewer) {
+          closeFullscreenViewer();
+        }
+      }
+
+      function handleEscapeKey(e) {
+        if (
+          e.key === "Escape" &&
+          !fullscreenViewer.classList.contains("hidden")
+        ) {
+          closeFullscreenViewer();
+        }
+      }
+
+      // Event listeners
+      closeViewer.addEventListener("click", closeFullscreenViewer);
+      fullscreenViewer.addEventListener("click", handleOutsideClick);
+      closeViewer.addEventListener("touchstart", closeFullscreenViewer);
+      fullscreenViewer.addEventListener("touchstart", handleOutsideClick);
+      document.addEventListener("keydown", handleEscapeKey);
+
+      // Initialize
+      loadImages();
+    }
+
+    // Check if the page is loaded via HTMX
+    // if (document.body.getAttribute('data-htmx-history-restore') !== 'true') {
+    //   document.addEventListener("DOMContentLoaded", initializeModelPage);
+    // } else {
+    //   initializeModelPage();
+    // }
+    initializeModelPage();
+  })();
 </script>

@@ -68,12 +68,9 @@
       const alt = container.dataset.alt;
 
       loadImage(url).then((objectUrl) => {
-        console.log("Loaded image:", objectUrl);
         const img = new Image();
         img.onload = function () {
-          console.log("Image loaded successfully:", objectUrl);
           container.innerHTML = `<img src="${objectUrl}" alt="${alt}" class="w-full h-48 object-cover" style="object-position: left -20px">`;
-          console.log("Image element added to container:", container.innerHTML);
         };
         img.onerror = function () {
           const video = document.createElement("video");

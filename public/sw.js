@@ -1,9 +1,8 @@
-const CACHE_NAME = 'media-cache-v9';
+const CACHE_NAME = 'media-cache-v10';
 
 self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      console.log('Cache opened:', CACHE_NAME);
     })
   );
 });
@@ -13,18 +12,13 @@ self.addEventListener('fetch', function(event) {
     event.respondWith(
       caches.match(event.request)
         .then(function(response) {
-          console.log('Fetching image:', event.request.url);
           if (response) {
-            console.log('Cache hit for:', event.request.url);
             return response;
           }
-          console.log('Cache miss for:', event.request.url);
           return fetch(event.request).then(function(networkResponse) {
             if (!networkResponse || networkResponse.status !== 200) {
-              console.log('Network fetch failed for:', event.request.url);
               return networkResponse;
             }
-            console.log('Network fetch succeeded for:', event.request.url);
             var responseToCache = networkResponse.clone();
             caches.open(CACHE_NAME)
               .then(function(cache) {
@@ -49,7 +43,6 @@ self.addEventListener('activate', function(event) {
       return Promise.all(
         cacheNames.map(function(cacheName) {
           if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
