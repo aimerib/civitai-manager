@@ -146,6 +146,9 @@
       const closeViewer = document.getElementById("close-viewer");
 
       function loadImages() {
+        let touchStartX, touchStartY;
+        const touchThreshold = 10; // pixels
+
         mediaContainers.forEach((container) => {
           const img = document.createElement("img");
           img.src = container.dataset.src;
@@ -164,7 +167,21 @@
           };
 
           img.addEventListener("click", handleImageClick);
-          img.addEventListener("touchend", handleImageClick);
+          img.addEventListener("touchstart", (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+          });
+
+          img.addEventListener("touchend", (e) => {
+            const touchEndX = e.changedTouches[0].screenX;
+            const touchEndY = e.changedTouches[0].screenY;
+            const deltaX = Math.abs(touchStartX - touchEndX);
+            const deltaY = Math.abs(touchStartY - touchEndY);
+
+            if (deltaX < touchThreshold && deltaY < touchThreshold) {
+              handleImageClick(e);
+            }
+          });
         });
       }
 
@@ -198,8 +215,8 @@
       // Event listeners
       closeViewer.addEventListener("click", closeFullscreenViewer);
       fullscreenViewer.addEventListener("click", handleOutsideClick);
-      closeViewer.addEventListener("touchstart", closeFullscreenViewer);
-      fullscreenViewer.addEventListener("touchstart", handleOutsideClick);
+      closeViewer.addEventListener("touchend", closeFullscreenViewer);
+      fullscreenViewer.addEventListener("touchend", closeFullscreenViewer);
       document.addEventListener("keydown", handleEscapeKey);
 
       // Initialize
