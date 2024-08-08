@@ -12,8 +12,8 @@ import (
 type Model struct {
 	ID                    uint           `gorm:"primaryKey" json:"-"`
 	CivitaiID             int            `gorm:"uniqueIndex" json:"id"`
-	Name                  *string        `json:"name"`
-	Description           *string        `json:"description"`
+	Name                  string         `json:"name"`
+	Description           string         `json:"description"`
 	AllowNoCredit         bool           `json:"allowNoCredit"`
 	AllowDerivatives      bool           `json:"allowDerivatives"`
 	AllowDifferentLicense bool           `json:"allowDifferentLicense"`
@@ -23,7 +23,7 @@ type Model struct {
 	Poi                   bool           `json:"poi"`
 	Nsfw                  bool           `json:"nsfw"`
 	NsfwLevel             int            `json:"nsfwLevel"`
-	Cosmetic              *string        `json:"cosmetic"`
+	Cosmetic              string         `json:"cosmetic"`
 	CreatedAt             time.Time      `json:"-"`
 	UpdatedAt             time.Time      `json:"-"`
 	ModelVersions         []ModelVersion `gorm:"foreignKey:ModelID" json:"modelVersions"`

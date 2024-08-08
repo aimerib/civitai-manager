@@ -13,8 +13,8 @@ type Image struct {
 	NSFWLevel      int       `json:"nsfwLevel"`
 	Width          int       `json:"width"`
 	Height         int       `json:"height"`
-	Hash           *string   `json:"hash"`
-	Type           *string   `json:"type"`
+	Hash           string    `json:"hash"`
+	Type           string    `json:"type"`
 	HasMeta        bool      `json:"hasMeta"`
 	OnSite         bool      `json:"onSite"`
 	CreatedAt      time.Time `json:"-"`

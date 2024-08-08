@@ -3,6 +3,8 @@ package handlers
 import (
 	"civitai-manager/middleware"
 	"civitai-manager/models"
+	"civitai-manager/utils"
+	"civitai-manager/views"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -31,9 +33,13 @@ func (h *ModelHandler) ModelsIndex(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "models/index.html", gin.H{
-		"models": allModels,
-	})
+	// c.HTML(http.StatusOK, "models/index", gin.H{
+	// 	"models":  allModels,
+	// 	"Request": c.Request,
+	// })
+	c.Header("Content-Type", "text/html")
+	utils.RenderView(c, views.ModelsIndex(allModels))
+	// views.Layout("Models", views.ModelsIndex(allModels)).Render(c, c.Writer)
 }
 
 func (h *ModelHandler) ModelsShow(c *gin.Context) {
@@ -56,7 +62,10 @@ func (h *ModelHandler) ModelsShow(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "models/show.html", gin.H{
-		"model": model,
-	})
+	utils.RenderView(c, views.ModelsShow(model))
+
+	// c.HTML(http.StatusOK, "models/show", gin.H{
+	// 	"model":   model,
+	// 	"Request": c.Request,
+	// })
 }

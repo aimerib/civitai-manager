@@ -3,24 +3,25 @@ TAILWIND_CLI := ./bin/tailwindcss
 .PHONY: dev build clean install
 
 dev: install
-		make -j 2 run-tailwind run-buffalo
+		make -j 2 run-tailwind run-web
 
 run-tailwind:
-		$(TAILWIND_CLI) -i ./assets/css/tailwind.css -o ./public/assets/main.css --watch
+		$(TAILWIND_CLI) -i ./css/tailwind.css -o ./public/assets/css/main.css --watch
 
-run-buffalo:
-		buffalo dev
+run-web:
+		air
 
 .PHONY: dev run-tailwind run-buffalo
 
 build: install
-				$(TAILWIND_CLI) -i ./assets/css/tailwind.css -o ./public/assets/main.css --minify
+				$(TAILWIND_CLI) -i ./css/tailwind.css -o ./public/assets/css/main.css --minify
 				buffalo build
 
 clean:
 		rm -rf tmp
 		rm -rf bin
-		rm public/assets/main.css
+		rm public/assets/css/main.css
+		rm *.sqlite
 
 install:
 		go mod tidy

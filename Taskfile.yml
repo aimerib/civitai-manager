@@ -1,0 +1,8 @@
+version: '3'
+
+tasks:
+  fetch_models:
+    desc: Fetch and update models from API
+    cmds:
+      - go run cmd/fetch_models/main.go {{.CLI_ARGS}}
+    silent: true

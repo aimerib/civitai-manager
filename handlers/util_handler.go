@@ -1,10 +1,7 @@
 package handlers
 
 import (
-	"net/http"
 	"sync"
-
-	"github.com/gin-gonic/gin"
 )
 
 type FlashMessage struct {
@@ -42,30 +39,31 @@ func (ms *MessageStore) Delete(key string) {
 
 type UtilHandler struct{}
 
-func NewUtilHandler() *UtilHandler {
-	return &UtilHandler{}
-}
+// func NewUtilHandler() *UtilHandler {
+// 	return &UtilHandler{}
+// }
 
-func (h *UtilHandler) FlashHandler(c *gin.Context) {
-	taskID := c.Param("taskID")
+// func (h *UtilHandler) FlashHandler(c *gin.Context) {
+// 	taskID := c.Param("taskID")
 
-	if result, exists := globalMessageStore.Get(taskID); exists {
-		c.Set("flash", result)
-		globalMessageStore.Delete(taskID)
-	}
+// 	if result, exists := globalMessageStore.Get(taskID); exists {
+// 		c.Set("flash", result)
+// 		globalMessageStore.Delete(taskID)
+// 	}
 
-	c.HTML(http.StatusOK, "_flash.html", gin.H{
-		"flash": c.MustGet("flash"),
-	})
-}
+// 	c.HTML(http.StatusOK, "_flash.html", gin.H{
+// 		"flash": c.MustGet("flash"),
+// 	})
+// }
 
-func (h *UtilHandler) RoutesHandler(c *gin.Context) {
-	routes := []gin.RouteInfo{}
-	for _, r := range gin.Default().Routes() {
-		routes = append(routes, r)
-	}
+// func (h *UtilHandler) RoutesHandler(c *gin.Context) {
+// 	routes := []gin.RouteInfo{}
+// 	for _, r := range gin.Default().Routes() {
+// 		routes = append(routes, r)
+// 	}
 
-	c.HTML(http.StatusOK, "utils/routes.html", gin.H{
-		"routes": routes,
-	})
-}
+// 	c.HTML(http.StatusOK, "utils/routes", gin.H{
+// 		"routes":  routes,
+// 		"Request": c.Request,
+// 	})
+// }

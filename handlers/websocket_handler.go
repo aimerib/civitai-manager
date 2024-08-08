@@ -16,8 +16,14 @@ var (
 	clientsMutex sync.Mutex
 )
 
+type WebsocketHandler struct{}
+
+func NewWebsocketHandler() *WebsocketHandler {
+	return &WebsocketHandler{}
+}
+
 // WebSocketHandler handles WebSocket connections
-func WebSocketHandler(c *gin.Context) error {
+func (ws *WebsocketHandler) WebSocketHandler(c *gin.Context) {
 	taskID := c.Param("taskID")
 
 	conn, err := websocket.Accept(c.Writer, c.Request, &websocket.AcceptOptions{
@@ -25,7 +31,6 @@ func WebSocketHandler(c *gin.Context) error {
 	})
 	if err != nil {
 		log.Printf("Error accepting WebSocket connection: %v", err)
-		return err
 	}
 	defer conn.Close(websocket.StatusInternalError, "the sky is falling")
 
@@ -54,11 +59,10 @@ func WebSocketHandler(c *gin.Context) error {
 		}
 	}
 
-	return nil
 }
 
 // SendWebSocketUpdate sends an update to all connected clients for a specific task
-func SendWebSocketUpdate(taskID string, message interface{}) {
+func (ws *WebsocketHandler) SendWebSocketUpdate(taskID string, message interface{}) error {
 	clientsMutex.Lock()
 	defer clientsMutex.Unlock()
 
@@ -72,6 +76,8 @@ func SendWebSocketUpdate(taskID string, message interface{}) {
 			conn.Close(websocket.StatusInternalError, "failed to send message")
 			// Optionally, log the error
 			// log.Printf("Error sending WebSocket message: %v", err)
+			return err
 		}
 	}
+	return nil
 }

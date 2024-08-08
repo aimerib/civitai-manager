@@ -9,20 +9,20 @@ import (
 
 type File struct {
 	ID                uint            `gorm:"primaryKey" json:"-"`
-	CivitaiID         *int            `json:"id"`
+	CivitaiID         int             `json:"id"`
 	ModelVersionID    uint            `gorm:"index" json:"-"`
 	SizeKB            float64         `json:"sizeKB"`
-	Name              *string         `json:"name"`
-	Type              *string         `json:"type"`
-	PickleScanResult  *string         `json:"pickleScanResult"`
-	PickleScanMessage *string         `json:"pickleScanMessage"`
-	VirusScanResult   *string         `json:"virusScanResult"`
-	VirusScanMessage  *string         `json:"virusScanMessage"`
+	Name              string          `json:"name"`
+	Type              string          `json:"type"`
+	PickleScanResult  string          `json:"pickleScanResult"`
+	PickleScanMessage string          `json:"pickleScanMessage"`
+	VirusScanResult   string          `json:"virusScanResult"`
+	VirusScanMessage  string          `json:"virusScanMessage"`
 	ScannedAt         time.Time       `json:"scannedAt"`
 	Metadata          json.RawMessage `gorm:"type:json" json:"metadata"`
 	Hashes            json.RawMessage `gorm:"type:json" json:"hashes"`
 	DownloadURL       string          `json:"downloadUrl"`
-	IsPrimary         *bool           `json:"primary"`
+	IsPrimary         bool            `json:"primary"`
 	CreatedAt         time.Time       `json:"created_at"`
 	UpdatedAt         time.Time       `json:"updated_at"`
 }

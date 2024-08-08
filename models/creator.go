@@ -8,8 +8,8 @@ import (
 
 type Creator struct {
 	ID        uint      `gorm:"primaryKey" json:"-"`
-	Username  *string   `json:"username"`
-	Image     *string   `json:"image"`
+	Username  string    `json:"username"`
+	Image     string    `json:"image"`
 	ModelID   uint      `json:"-"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`

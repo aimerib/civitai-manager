@@ -3,24 +3,32 @@ package main
 import (
 	"civitai-manager/config"
 	"civitai-manager/handlers"
-	"civitai-manager/helpers"
 	"civitai-manager/middleware"
-	"html/template"
+	"civitai-manager/views"
+	"civitai-manager/workers"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 
+	"github.com/a-h/templ"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
+	"github.com/gorilla/csrf"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	// Initialize logger
-	logger, _ := zap.NewProduction()
-	defer logger.Sync()
+	gin.SetMode(gin.DebugMode)
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found")
+	}
 
 	r := gin.Default()
+
+	// Use custom middleware
+	r.Use(middleware.CacheMiddleware())
 
 	// Initialize database connection
 	db, err := config.InitDB()
@@ -33,50 +41,80 @@ func main() {
 	r.Use(sessions.Sessions("_civitai_manager_session", store))
 	r.Use(middleware.SessionData())
 
-	// Use the parameter logger middleware
-	r.Use(middleware.ParamLogger(logger))
-
-	// Use CSRF middleware
-	r.Use(middleware.CSRF())
-
 	// Use DB Transaction middleware
 	r.Use(middleware.DBTransactionMiddleware(db))
 
-	// Initialize template helpers
-	templateHelpers := helpers.NewTemplateHelpers()
+	// Initialize TemplateHelpers
+	// templateHelpers := helpers.NewTemplateHelpers()
 
-	r.SetFuncMap(templateHelpers.FuncMap())
-	r.SetFuncMap(template.FuncMap{
-		"csrfField": func(c *gin.Context) template.HTML {
-			token := middleware.GetCSRFToken(c)
-			return template.HTML(`<input type="hidden" name="csrf_token" value="` + token + `">`)
-		},
-	})
+	// // Debug: Print out the keys in the FuncMap
+	// funcMap := templateHelpers.FuncMap()
 
-	r.LoadHTMLGlob("templates/**/*")
+	// // Add the FuncMap to the default template functions
+	// r.SetFuncMap(funcMap)
 
 	// Initialize handlers
 	modelHandler := handlers.NewModelHandler()
-	settingsHandler := handlers.NewSettingsHandler()
-	utilHandler := handlers.NewUtilHandler()
+	// utilHandler := handlers.NewUtilHandler()
+	websocketHandler := handlers.NewWebsocketHandler()
 
 	// Setup routes
-	r.GET("/", modelHandler.ModelsIndex)
+	r.GET("/", WithLayout("Models", modelHandler.ModelsIndex))
 	r.GET("/models", modelHandler.ModelsIndex)
 	r.GET("/models/:id", modelHandler.ModelsShow)
+	// r.GET("/flash-partial/:taskID", utilHandler.FlashHandler)
+	// r.GET("/routes", utilHandler.RoutesHandler)
+
+	// Initialize in-memory worker
+	worker := workers.NewWorker(10) // 10 concurrent workers
+	worker.RegisterModelFetchWorker(db)
+	worker.Start()
+	defer worker.Stop()
+
+	// Initialize handlers
+	settingsHandler := handlers.NewSettingsHandler(worker)
+
+	// Setup routes
 	r.GET("/settings", settingsHandler.Index)
-	r.GET("/flash-partial/:taskID", utilHandler.FlashHandler)
-	r.GET("/routes", utilHandler.RoutesHandler) // New handler for displaying routes
+	r.POST("/settings/run-fetch-job", settingsHandler.StartBackgroundFetchJob)
+	r.GET("/ws/:taskID", websocketHandler.WebSocketHandler)
 
-	// Example nested routes
-	// r.GET("/models/:model_id/versions", modelHandler.VersionsIndex)
-	// r.GET("/models/:model_id/versions/:id", modelHandler.VersionsShow)
-
-	r.Static("/public", "./public")
+	r.Static("/assets", "./public/assets")
+	r.Static("/robots.txt", "./public/robots.txt")
+	r.Static("/sw.js", "./public/assets/js/sw.js")
 
 	// Start the server
-	log.Println("Starting server on :8080")
-	if err := r.Run(":8080"); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+	log.Println("Starting server on :" + port)
+
+	// Add the new CSRF middleware
+	csrfMiddleware := csrf.Protect(
+		[]byte("32-byte-long-auth-key"), // Replace with a secure key
+		csrf.Secure(false),              // Set to true in production
+		csrf.Path("/"),
+	)
+
+	// Wrap your router with the CSRF middleware
+	http.ListenAndServe(":"+port, csrfMiddleware(r))
+}
+
+func RenderView(c *gin.Context, view templ.Component) {
+	c.Set("content", view)
+}
+
+func WithLayout(t string, h gin.HandlerFunc) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		h(c)
+		if !c.IsAborted() {
+			content := c.MustGet("content").(templ.Component)
+			csrfField := csrf.TemplateField(c.Request)
+			templWrapper := fmt.Sprint("%v", csrfField)
+			fmt.Println("Content:", content)
+			fmt.Println("TemplWrapper:", templWrapper)
+			views.Layout(t, content, templWrapper).Render(c, c.Writer)
+		}
 	}
 }
